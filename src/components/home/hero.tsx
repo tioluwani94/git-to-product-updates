@@ -23,14 +23,14 @@ export const Hero = () => {
         <Box textAlign="center">
           <Heading
             as="h1"
-            size="3xl"
-            fontWeight="extrabold"
-            maxW="48rem"
             mx="auto"
+            size="3xl"
+            maxW="54rem"
             lineHeight="1.2"
             letterSpacing="tight"
+            fontWeight="extrabold"
           >
-            Design collaboration without the chaos
+            AI-generated product updates from Git commits, PRs and changelogs
           </Heading>
           <Text fontSize="xl" mt="4" maxW="xl" mx="auto">
             Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
