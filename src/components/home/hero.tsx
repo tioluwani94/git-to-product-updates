@@ -9,6 +9,7 @@ import {
   Text,
   VisuallyHidden,
 } from "@chakra-ui/react";
+import { signIn } from "next-auth/react";
 import { FaGithub, FaPlay } from "react-icons/fa";
 
 export const Hero = () => {
@@ -52,6 +53,7 @@ export const Hero = () => {
               fontWeight="bold"
               colorScheme="blue"
               leftIcon={<FaGithub />}
+              onClick={() => signIn()}
             >
               Get started with Github
             </Button>

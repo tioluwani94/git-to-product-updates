@@ -15,9 +15,10 @@ import {
 } from "@chakra-ui/react";
 import { Logo } from "./logo";
 import { FaGithub } from "react-icons/fa";
+import { useSession, signIn, signOut } from "next-auth/react";
 
 export const Navbar = () => {
-  const isLoggedIn = false;
+  const { data: session } = useSession();
   return (
     <Box as="nav" bg="bg-surface" boxShadow="sm">
       <Container py={{ base: "3", lg: "4" }}>
@@ -25,9 +26,14 @@ export const Navbar = () => {
           <HStack spacing="4">
             <Logo />
           </HStack>
-          {!isLoggedIn ? (
+          {!session ? (
             <HStack spacing="4">
-              <Button size="sm" colorScheme="blue" leftIcon={<FaGithub />}>
+              <Button
+                size="sm"
+                colorScheme="blue"
+                leftIcon={<FaGithub />}
+                onClick={() => signIn()}
+              >
                 Sign in with Github
               </Button>
             </HStack>
@@ -48,6 +54,7 @@ export const Navbar = () => {
                       p="0.5rem"
                       rounded="8px"
                       cursor="pointer"
+                      onClick={() => signOut()}
                       _hover={{ bg: "gray.100" }}
                     >
                       <ListIcon />
