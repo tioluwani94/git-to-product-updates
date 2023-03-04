@@ -13,12 +13,16 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@chakra-ui/react";
-import { Logo } from "./logo";
+import { signIn, signOut, useSession } from "next-auth/react";
 import { FaGithub } from "react-icons/fa";
-import { useSession, signIn, signOut } from "next-auth/react";
+import { MdLogout } from "react-icons/md";
+import { Logo } from "./logo";
 
 export const Navbar = () => {
   const { data: session } = useSession();
+
+  const { user } = session ?? {};
+
   return (
     <Box as="nav" bg="bg-surface" boxShadow="sm">
       <Container py={{ base: "3", lg: "4" }}>
@@ -38,16 +42,21 @@ export const Navbar = () => {
               </Button>
             </HStack>
           ) : (
-            <Popover>
+            <Popover placement="bottom-end">
               <PopoverTrigger>
                 <Avatar
                   boxSize="10"
+                  color="white"
                   cursor="pointer"
-                  name="Christoph Winston"
-                  src="https://tinyurl.com/yhkm2ek8"
+                  name={user?.name ?? ""}
+                  src={user?.image ?? ""}
                 />
               </PopoverTrigger>
-              <PopoverContent>
+              <PopoverContent
+                _focus={{ shadow: "lg" }}
+                maxW="200px"
+                shadow="lg"
+              >
                 <PopoverBody px="0">
                   <List px="0.5rem">
                     <ListItem
@@ -57,7 +66,7 @@ export const Navbar = () => {
                       onClick={() => signOut()}
                       _hover={{ bg: "gray.100" }}
                     >
-                      <ListIcon />
+                      <ListIcon as={MdLogout} />
                       Logout
                     </ListItem>
                   </List>
