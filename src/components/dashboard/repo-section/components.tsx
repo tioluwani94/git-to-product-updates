@@ -132,7 +132,7 @@ const ConfigurationForm = ({
 }: {
   onSubmit: FormikConfig<ConfigurationFormValues>["onSubmit"];
 }) => {
-  const { values, setFieldValue, handleSubmit, handleChange } =
+  const { values, setFieldValue, handleSubmit, handleChange, isSubmitting } =
     useFormik<ConfigurationFormValues>({
       onSubmit,
       initialValues: {
@@ -180,6 +180,7 @@ const ConfigurationForm = ({
           size="sm"
           type="submit"
           colorScheme="green"
+          isLoading={isSubmitting}
           isDisabled={!values.from.length}
         >
           Generate Content
