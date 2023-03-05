@@ -4,7 +4,7 @@ import React from "react";
 export const Logo = (props: HeadingProps) => {
   return (
     <Heading size="xs" {...props}>
-      Prodates
+      VersionVault
     </Heading>
   );
 };

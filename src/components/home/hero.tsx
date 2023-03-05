@@ -14,11 +14,11 @@ import { FaGithub, FaPlay } from "react-icons/fa";
 
 export const Hero = () => {
   return (
-    <Box as="section" bg="gray.800" color="white" py="7.5rem">
+    <Box as="section" bg="gray.800" color="white" py="4rem">
       <Box
-        maxW={{ base: "xl", md: "5xl" }}
         mx="auto"
         px={{ base: "6", md: "8" }}
+        maxW={{ base: "xl", md: "5xl" }}
       >
         <Box textAlign="center">
           <Heading
@@ -30,11 +30,11 @@ export const Hero = () => {
             letterSpacing="tight"
             fontWeight="extrabold"
           >
-            AI-generated product updates from Git commits, PRs and changelogs
+            AI-generated product updates from Git commits, PRs and Changelogs
           </Heading>
           <Text fontSize="xl" mt="4" maxW="xl" mx="auto">
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
-            eiusmod tempor incididunt ut labore
+            Simplify your release process and generate polished, detailed
+            release notes with the help of our AI-powered changelog assistant
           </Text>
         </Box>
 

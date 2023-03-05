@@ -14,6 +14,7 @@ import {
   PopoverTrigger,
 } from "@chakra-ui/react";
 import { signIn, signOut, useSession } from "next-auth/react";
+import { useRouter } from "next/router";
 import { FaGithub } from "react-icons/fa";
 import { MdLogout } from "react-icons/md";
 import { Logo } from "./logo";
@@ -23,12 +24,24 @@ export const Navbar = () => {
 
   const { user } = session ?? {};
 
+  const { asPath } = useRouter();
+
+  const bgStyle: { [key: string]: string } = {
+    "/": "gray.800",
+    "/dashboard": "bg-surface",
+  };
+
+  const logoColor: { [key: string]: string } = {
+    "/": "white",
+    "/dashboard": "gray.900",
+  };
+
   return (
-    <Box as="nav" bg="bg-surface" boxShadow="sm">
+    <Box as="nav" bg={bgStyle[asPath]} boxShadow="sm">
       <Container py={{ base: "3", lg: "4" }}>
         <Flex justify="space-between">
           <HStack spacing="4">
-            <Logo />
+            <Logo color={logoColor[asPath]} />
           </HStack>
           {!session ? (
             <HStack spacing="4">
