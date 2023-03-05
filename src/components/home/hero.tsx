@@ -30,7 +30,7 @@ export const Hero = () => {
             letterSpacing="tight"
             fontWeight="extrabold"
           >
-            AI-generated product updates from Git commits, PRs and Changelogs
+            AI-generated release notes from your Git commits, PRs and Changelogs
           </Heading>
           <Text fontSize="xl" mt="4" maxW="xl" mx="auto">
             Simplify your release process and generate polished, detailed
