@@ -11,16 +11,16 @@ export default async function handler(
     const { profile, accessToken } =
       (await getServerSession(req, res, authOptions)) ?? {};
 
-    const { repo_name, until } = req.query;
+    const { repo_name, state, owner } = req.query;
 
     const { data } = await axios.get(
-      `${process.env.GITHUB_BASE_URL}/repos/${profile.login}/${repo_name}/pulls`,
+      `${process.env.GITHUB_BASE_URL}/repos/${owner}/${repo_name}/pulls`,
       {
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${accessToken}`,
         },
-        params: { state: "all", until },
+        params: { state },
       }
     );
     res.status(200).json(data);

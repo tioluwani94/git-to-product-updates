@@ -6,6 +6,7 @@ export const getUserRepos = async () => {
 };
 
 export const getRepoCommits = async (params: {
+  owner: string;
   until?: string;
   repo_name: string;
 }) => {
@@ -15,7 +16,11 @@ export const getRepoCommits = async (params: {
   return data;
 };
 
-export const getRepoPullRequests = async (params: { repo_name: string }) => {
+export const getRepoPullRequests = async (params: {
+  owner: string;
+  repo_name: string;
+  state?: "open" | "closed" | "all";
+}) => {
   const { data } = await axios.get("/api/github/pull-request/list", {
     params,
   });

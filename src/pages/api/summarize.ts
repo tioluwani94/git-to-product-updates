@@ -9,17 +9,18 @@ if (!process.env.OPENAI_API_KEY) {
 }
 
 export default async function handler(req: Request) {
-  const { content } = (await req.json()) as {
-    content?: string;
+  const { repo_name, commit_messages } = (await req.json()) as {
+    repo_name: string;
+    commit_messages: string[];
   };
 
-  if (!content) {
+  if (!repo_name) {
     return new Response("No prompt in the request", { status: 500 });
   }
 
   try {
     //TODO: Generate prompt for Open AI
-    const prompt = ``;
+    const prompt = `Below is the name of a repository and some commit messages of the repository in an array. \nGenerate a product release note based on the commit message changes, use simple and understandable language. The repository is for a software product.\n Repository name: ${repo_name}\n Commit messages: \n ${commit_messages}`;
 
     const payload = {
       model: "text-davinci-003",

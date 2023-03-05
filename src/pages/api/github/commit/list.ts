@@ -11,10 +11,10 @@ export default async function handler(
     const { profile, accessToken } =
       (await getServerSession(req, res, authOptions)) ?? {};
 
-    const { repo_name, until } = req.query;
+    const { repo_name, until, owner } = req.query;
 
     const { data } = await axios.get(
-      `${process.env.GITHUB_BASE_URL}/repos/${profile.login}/${repo_name}/commits`,
+      `${process.env.GITHUB_BASE_URL}/repos/${owner}/${repo_name}/commits`,
       {
         headers: {
           "Content-Type": "application/json",
