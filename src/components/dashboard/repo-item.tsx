@@ -1,13 +1,5 @@
-import {
-  Button,
-  Flex,
-  FlexProps,
-  HStack,
-  Text,
-  VStack,
-} from "@chakra-ui/react";
+import { Button, Flex, FlexProps, HStack, Text } from "@chakra-ui/react";
 import formatDistanceToNowStrict from "date-fns/formatDistanceToNowStrict";
-import React from "react";
 import { MdLockOutline } from "react-icons/md";
 
 export const RepoItem = ({

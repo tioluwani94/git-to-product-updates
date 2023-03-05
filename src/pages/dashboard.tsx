@@ -1,7 +1,7 @@
 import { DashboardProvider } from "@/components/dashboard/provider";
 import { RepoSection } from "@/components/dashboard/repo-section";
 import { ReposSection } from "@/components/dashboard/repos-section";
-import { Box, Container } from "@chakra-ui/react";
+import { Container } from "@chakra-ui/react";
 
 export default function Dashboard() {
   return (
