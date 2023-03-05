@@ -10,7 +10,10 @@ import formatDistanceToNowStrict from "date-fns/formatDistanceToNowStrict";
 import React from "react";
 import { MdLockOutline } from "react-icons/md";
 
-export const RepoItem = ({ repo }: { repo: any } & FlexProps) => {
+export const RepoItem = ({
+  repo,
+  onClick,
+}: { repo: any; onClick(): void } & FlexProps) => {
   return (
     <Flex
       p="0.875rem 1rem"
@@ -30,7 +33,9 @@ export const RepoItem = ({ repo }: { repo: any } & FlexProps) => {
           })}
         </Text>
       </HStack>
-      <Button size="sm">Import</Button>
+      <Button size="sm" onClick={onClick}>
+        Import
+      </Button>
     </Flex>
   );
 };
