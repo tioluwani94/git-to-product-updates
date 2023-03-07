@@ -8,7 +8,7 @@ export default async function handler(
   res: NextApiResponse
 ) {
   try {
-    const { profile, accessToken } =
+    const { accessToken } =
       (await getServerSession(req, res, authOptions)) ?? {};
 
     const { repo_name, until, owner } = req.query;

@@ -68,34 +68,6 @@ const Header = () => {
   );
 };
 
-const ConfigurationSteps = () => {
-  return (
-    <Stack px="0.5rem" spacing="0">
-      <Stack isInline>
-        <Stack spacing="0">
-          <Box bg="gray.600" rounded="50%" boxSize="8px" />
-          <Box
-            width="2px"
-            left="3px"
-            height="40px"
-            bg="gray.200"
-            position="relative"
-          />
-        </Stack>
-        <Text fontSize="0.875rem" color="gray.500">
-          Configure
-        </Text>
-      </Stack>
-      <Stack isInline>
-        <Box bg="gray.200" rounded="50%" boxSize="8px" />
-        <Text fontSize="0.875rem" color="gray.500">
-          Generate
-        </Text>
-      </Stack>
-    </Stack>
-  );
-};
-
 const RepoInformation = () => {
   const { selectedRepo } = useDashboard();
 
@@ -208,7 +180,6 @@ const LeftSection = () => {
         <Text>{selectedRepo.name}</Text>
         {selectedRepo.visibility === "private" && <MdLockOutline />}
       </Stack>
-      <ConfigurationSteps />
       <Divider />
       <RepoInformation />
       <Divider />

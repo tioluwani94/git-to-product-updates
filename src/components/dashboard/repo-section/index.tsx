@@ -70,12 +70,21 @@ export const RepoSection = () => {
       (item: any) => item.commit.message
     );
 
+    const pull_requests = repoPullRequests?.map(({ title, body }: any) => ({
+      title,
+      body,
+    }));
+
     const response = await fetch("/api/summarize", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ repo_name: selectedRepo.name, commit_messages }),
+      body: JSON.stringify({
+        pull_requests,
+        commit_messages,
+        repo_name: selectedRepo.name,
+      }),
     });
 
     if (!response.ok) {
