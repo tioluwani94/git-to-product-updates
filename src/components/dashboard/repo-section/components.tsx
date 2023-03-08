@@ -113,6 +113,9 @@ const ConfigurationForm = ({
       },
     });
 
+  const isDisabled =
+    !values.from.length || (values.from.includes("commit") && !values.until);
+
   return (
     <Box
       as="form"
@@ -153,7 +156,7 @@ const ConfigurationForm = ({
           type="submit"
           colorScheme="green"
           isLoading={isSubmitting}
-          isDisabled={!values.from.length}
+          isDisabled={isDisabled}
         >
           Generate Content
         </Button>
@@ -225,8 +228,8 @@ const RightSection = ({
             </Heading>
             <Box p="1rem" rounded="8px" borderWidth="1px">
               {summary.split(". ").map((sentence, index) => (
-                <Stack spacing="1rem" as="ul" key={index}>
-                  {sentence.length > 0 && <Box as="li">{sentence}</Box>}
+                <Stack spacing="1rem" key={index}>
+                  {sentence.length > 0 && <Box>{sentence}</Box>}
                 </Stack>
               ))}
             </Box>

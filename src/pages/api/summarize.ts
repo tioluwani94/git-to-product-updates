@@ -27,7 +27,7 @@ export default async function handler(req: Request) {
   }
 
   if (commit_messages && pull_requests) {
-    prompt = `Below is the name of a repository and some commit messages as well as pull requests information of the repository in an array. \nGenerate a product release note based on the commit message changes and pull requests information, use simple and understandable language. The repository is for a software product.\n Repository name: ${repo_name}\n Commit messages: \n ${commit_messages}`;
+    prompt = `Below is the name of a repository and some commit messages as well as pull requests information of the repository in an array. \nGenerate a product release note based on the commit message changes and pull requests information, use simple and understandable language. The repository is for a software product.\n Repository name: ${repo_name}\n Commit messages: \n ${commit_messages} \n Pull requests: \n ${pull_requests}`;
   } else if (pull_requests) {
     prompt = `Below is the name of a repository and some pull requests of the repository in an array. \nGenerate a product release note based on the pull requests information, use simple and understandable language. The repository is for a software product.\n Repository name: ${repo_name}\n Pull requests: \n ${pull_requests}`;
   } else {
