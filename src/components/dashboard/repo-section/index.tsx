@@ -50,8 +50,11 @@ export const RepoSection = () => {
     setSummary("");
     formikHelpers.setSubmitting(true);
 
+    const requiresCommit = values.from.includes("commit");
+    const requiresPullRequests = values.from.includes("pr");
+
     const repoCommits =
-      values.from.includes("commit") &&
+      requiresCommit &&
       (await getRepoCommits({
         until: values.until,
         repo_name: selectedRepo.name,
@@ -59,21 +62,23 @@ export const RepoSection = () => {
       }));
 
     const repoPullRequests =
-      values.from.includes("pr") &&
+      requiresPullRequests &&
       (await getRepoPullRequests({
         state: "closed",
         repo_name: selectedRepo.name,
         owner: selectedRepo.owner.login,
       }));
 
-    const commit_messages = repoCommits?.map(
-      (item: any) => item.commit.message
-    );
+    const commit_messages = !!requiresCommit
+      ? repoCommits?.map((item: any) => item.commit.message)
+      : undefined;
 
-    const pull_requests = repoPullRequests?.map(({ title, body }: any) => ({
-      title,
-      body,
-    }));
+    const pull_requests = !!requiresPullRequests
+      ? repoPullRequests?.map(({ title, body }: any) => ({
+          title,
+          body,
+        }))
+      : undefined;
 
     const response = await fetch("/api/summarize", {
       method: "POST",

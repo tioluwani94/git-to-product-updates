@@ -27,11 +27,11 @@ export default async function handler(req: Request) {
   }
 
   if (commit_messages && pull_requests) {
-    prompt = `Below is the name of a repository and some commit messages as well as pull requests information of the repository in an array. \nGenerate a product release note based on the commit message changes and pull requests information, use simple and understandable language. The repository is for a software product.\n Repository name: ${repo_name}\n Commit messages: \n ${commit_messages} \n Pull requests: \n ${pull_requests}`;
+    prompt = `Below is the name of a repository and some commit messages as well as pull requests information of the repository in an array. \nWrite a product release note based on the commit messages and pull requests information, use simple and understandable language. The repository is for a software product.\n Repository name: ${repo_name}\n Commit messages: \n ${commit_messages} \n Pull requests: \n ${pull_requests}`;
   } else if (pull_requests) {
-    prompt = `Below is the name of a repository and some pull requests of the repository in an array. \nGenerate a product release note based on the pull requests information, use simple and understandable language. The repository is for a software product.\n Repository name: ${repo_name}\n Pull requests: \n ${pull_requests}`;
+    prompt = `Below is the name of a repository and some pull requests of the repository in an array. \nWrite a product release note based on the pull requests information, use simple and understandable language. The repository is for a software product.\n Repository name: ${repo_name}\n Pull requests: \n ${pull_requests}`;
   } else {
-    prompt = `Below is the name of a repository and some commit messages of the repository in an array. \nGenerate a product release note based on the commit message changes, use simple and understandable language. The repository is for a software product.\n Repository name: ${repo_name}\n Commit messages: \n ${commit_messages}`;
+    prompt = `Below is the name of a repository and some commit messages of the repository in an array. \nWrite a product release note based on the commit messages, use simple and understandable language. The repository is for a software product.\n Repository name: ${repo_name}\n Commit messages: \n ${commit_messages}`;
   }
 
   try {
@@ -41,7 +41,7 @@ export default async function handler(req: Request) {
       top_p: 1,
       stream: true,
       max_tokens: 200,
-      temperature: 0.5,
+      temperature: 0.7,
       presence_penalty: 0,
       frequency_penalty: 0,
       model: "text-davinci-003",
