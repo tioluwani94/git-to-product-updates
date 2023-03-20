@@ -10,38 +10,43 @@ export const RepoSection = () => {
 
   const [summary, setSummary] = useState("");
 
-  //   const { data: repoCommits } = useQuery<any[]>(
-  //     ["repo-commits", selectedRepo],
-  //     () =>
-  //       getRepoCommits({
-  //         repo_name: selectedRepo.name,
-  //         owner: selectedRepo.owner.login,
-  //       }),
-  //     {
-  //       enabled: !!selectedRepo,
-  //     }
-  //   );
+  // const { data: repoCommits } = useQuery<any[]>(
+  //   ["repo-commits", selectedRepo],
+  //   () =>
+  //     getRepoCommits({
+  //       repo_name: selectedRepo.name,
+  //       owner: selectedRepo.owner.login,
+  //     }),
+  //   {
+  //     enabled: !!selectedRepo,
+  //   }
+  // );
 
-  //   const { data: repoPullRequests } = useQuery<any[]>(
-  //     ["repo-pull-requests", selectedRepo],
-  //     () =>
-  //       getRepoPullRequests({
-  //         state: "closed",
-  //         repo_name: selectedRepo.name,
-  //         owner: selectedRepo.owner.login,
-  //       }),
-  //     {
-  //       enabled: !!selectedRepo,
-  //     }
-  //   );
+  // const { data: repoPullRequests } = useQuery<any[]>(
+  //   ["repo-pull-requests", selectedRepo],
+  //   () =>
+  //     getRepoPullRequests({
+  //       state: "closed",
+  //       repo_name: selectedRepo.name,
+  //       owner: selectedRepo.owner.login,
+  //     }),
+  //   {
+  //     enabled: !!selectedRepo,
+  //   }
+  // );
 
-  //     console.log({
-  //       commits: repoCommits?.map((item: any) => item.commit.message),
-  //       pull_requests: repoPullRequests?.map(({ title, body }) => ({
-  //         title,
-  //         body,
-  //       })),
-  //     });
+  // console.log({
+  //   repoCommits,
+  //   repoPullRequests,
+  // });
+
+  // console.log({
+  //   commits: repoCommits?.map((item: any) => item.commit.message),
+  //   pull_requests: repoPullRequests?.map(({ title, body }) => ({
+  //     title,
+  //     body,
+  //   })),
+  // });
 
   const handleFormSubmit = async (
     values: C.ConfigurationFormValues,
