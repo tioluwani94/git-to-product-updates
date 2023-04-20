@@ -3,7 +3,9 @@ import { Stack } from "@chakra-ui/react";
 import { FormikHelpers } from "formik";
 import { useState } from "react";
 import { useDashboard } from "../provider";
+// import pick from "lodash/pick";
 import * as C from "./components";
+// import { useQuery } from "@tanstack/react-query";
 
 export const RepoSection = () => {
   const { section, selectedRepo } = useDashboard();
@@ -36,16 +38,19 @@ export const RepoSection = () => {
   // );
 
   // console.log({
-  //   repoCommits,
-  //   repoPullRequests,
-  // });
-
-  // console.log({
-  //   commits: repoCommits?.map((item: any) => item.commit.message),
-  //   pull_requests: repoPullRequests?.map(({ title, body }) => ({
-  //     title,
-  //     body,
+  //   commits: repoCommits?.map((item: any) => ({
+  //     commit: pick(item.commit, ["author", "committer", "message", "tree"]),
+  //     parents: item.parents,
   //   })),
+  //   pull_requests: repoPullRequests?.map(
+  //     ({ title, body, user, html_url, created_at }) => ({
+  //       body,
+  //       title,
+  //       html_url,
+  //       created_at,
+  //       user: pick(user, ["login"]),
+  //     })
+  //   ),
   // });
 
   const handleFormSubmit = async (
