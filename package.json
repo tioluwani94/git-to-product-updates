@@ -24,7 +24,7 @@
     "date-fns": "^2.29.3",
     "eslint": "8.35.0",
     "eslint-config-next": "13.2.3",
-    "eventsource-parser": "^0.1.0",
+    "eventsource-parser": "^1.0.0",
     "formik": "^2.2.9",
     "framer-motion": "^10.0.1",
     "lodash": "^4.17.21",

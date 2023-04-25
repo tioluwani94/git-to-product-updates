@@ -3,7 +3,7 @@ import { Stack } from "@chakra-ui/react";
 import { FormikHelpers } from "formik";
 import { useState } from "react";
 import { useDashboard } from "../provider";
-// import pick from "lodash/pick";
+import pick from "lodash/pick";
 import * as C from "./components";
 // import { useQuery } from "@tanstack/react-query";
 
@@ -80,13 +80,19 @@ export const RepoSection = () => {
       }));
 
     const commit_messages = !!requiresCommit
-      ? repoCommits?.map((item: any) => item.commit.message)
+      ? repoCommits?.map((item: any) => ({
+          commit: pick(item.commit, ["author", "committer", "message", "tree"]),
+          parents: item.parents,
+        }))
       : undefined;
 
     const pull_requests = !!requiresPullRequests
-      ? repoPullRequests?.map(({ title, body }: any) => ({
-          title,
-          body,
+      ? repoPullRequests?.map((item: any) => ({
+          body: item.body,
+          title: item.title,
+          html_url: item.html_url,
+          created_at: item.created_at,
+          user: pick(item.user, ["login"]),
         }))
       : undefined;
 

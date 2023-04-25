@@ -5,7 +5,6 @@ import {
   Checkbox,
   CheckboxGroup,
   Divider,
-  Flex,
   FormControl,
   FormHelperText,
   FormLabel,
@@ -15,7 +14,7 @@ import {
   Stack,
   Text,
 } from "@chakra-ui/react";
-import { FormikConfig, FormikHelpers, useFormik } from "formik";
+import { FormikConfig, useFormik } from "formik";
 import { FaGithub } from "react-icons/fa";
 import {
   MdArrowRightAlt,
