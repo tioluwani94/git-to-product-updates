@@ -1,3 +1,4 @@
+import { PromptJSONPayload } from "@/types";
 import { OpenAIStream, OpenAIStreamPayload } from "@/utils/openai-stream";
 
 export const config = {
@@ -7,11 +8,8 @@ export const config = {
 export default async function handler(req: Request) {
   const { repo_name, commit_messages, pull_requests } = (await req.json()) as {
     repo_name: string;
-    commit_messages: string[];
-    pull_requests: {
-      body: string;
-      title: string;
-    }[];
+    pull_requests: PromptJSONPayload[];
+    commit_messages: PromptJSONPayload[];
   };
 
   if (!repo_name) {
@@ -27,43 +25,79 @@ export default async function handler(req: Request) {
       messages: [
         {
           role: "system",
+          content: `Your task is to create an easily readable, human-friendly document that presents the software product updates clearly, based on Git commit messages and pull requests data. These data are provided in JSON format and encapsulate the changes that have been made to the software over time.`,
+        },
+        {
+          role: "user",
           content: `
-        You are a system for generating what's new, updates, change documentation for software products from their
-        Github Commits and Pull requests (PRs) information in their API response formats. 
-        Some of the requests you may get may contain only one of them (either commits or PRs)
-        You are to ensure that the documentation reflect the changes for the time period specified (if any)
-        Let it be organised logically and in simple, easy-to-understand language.`,
+          The goal is to transform this technical jargon into plain language updates that any end user can understand, making it easy for them to know what improvements, fixes or new features have been added. This document will help in increasing user satisfaction, and in turn, improve user retention and engagement.
+
+          In this transformation, ensure the following:
+
+          1. *Translate technical terminology to plain English:* If there's technical jargon or coder-speak in the commit messages or pull requests, translate it into something an average user can understand. Avoid using technical terms and abbreviations that a typical user may not know.
+
+          2. *Group related changes together:* Often, multiple commits or pull requests will relate to the same bug fix or feature update. Group these changes together in your summary so it's clear to a reader what changes were part of the same overall update.
+
+          3. *Highlight the benefits:* Whenever possible, emphasize how the changes benefit the user. For example, instead of saying "Updated database queries for efficiency", say something like "We made changes to make the app run faster and smoother".
+
+          4. *Remove unnecessary details:* Some commit messages and pull requests contain details that are irrelevant to the end user. These should be omitted from the final document.
+
+          5. *Use friendly, engaging language:* Try to keep the tone of the document friendly and engaging. Make the reader feel like this is a conversation, not a dry technical report.
+
+          6. *Structure the document logically:* Start with a brief introduction, followed by the main content - the updates, and conclude with a summary or a look ahead to future updates.
+
+          Consider this example:
+
+          If the JSON data is: 
+
+          json
+          {
+          "commits": [
+            {
+              "message": "Fixed a bug causing app crash when user tries to update profile",
+              "date": "2023-04-21"
+            },
+            {
+              "message": "Added caching to improve data retrieval speed",
+              "date": "2023-04-25"
+            }
+          ]
+          }
+
+
+          Your corresponding product update might look like:
+
+          ---
+
+          *Software Product Updates*
+
+          Hello Users! 
+
+          We've been busy making some updates to improve your experience:
+
+          *1. Smoother Profile Updates (April 21):* We fixed an issue that was causing the app to crash when you tried to update your profile. Now, you can make changes to your profile with ease!
+
+          *2. Faster App Performance (April 25):* We've made some changes under the hood to make our app run faster. We've added something called 'caching' which helps the app retrieve data quicker, resulting in smoother navigation for you!
+
+          We hope you enjoy these updates! As always, we're continually working to improve the app and make your experience better. Stay tuned for more improvements in the future!
+
+          ---
+
+          The end goal is to ensure that the user feels informed and excited about the improvements to the software product they're using. Good luck!`,
         },
         {
           role: "user",
-          content: `INSTRUCTIONS:
-        In order to generate the needed what's new, updates, change documentation you need the following fields from commits:
-        commit.message: This field contains the commit message, which should provide a brief summary of the changes made in the commit. You can use the commit messages to create a brief summary of the changes that have been made since the last release.
-        commit.author.name and commit.committer.name: These fields contain the names of the author and committer of the commit, respectively. You can use these names to give credit to the individuals who contributed to the changes.
-        commit.author.date and commit.committer.date: These fields contain the dates that the commit was authored and committed, respectively. You can use these dates to provide a timeline of the changes made to the software.
-        parents: This field contains an array of parent commit objects, which represent the commits that the current commit was based on. You can use this information to determine the changes made in the current commit relative to its parent commit.
-        commit.tree: This field contains the sha of the individual commit, useful for comparing with parents and determining relative position.
+          content: `
+          Below is the Git commit messages and pull requests JSON payload separated by asterisks:
+           ******************
+           ${JSON.stringify({
+             commit_messages,
+             pull_requests,
+           })}
+           ******************
 
-        And from PRs:
-        title: This field contains the title of the pull request, which typically provides a brief summary of the changes made in the pull request. You can use the title to create a brief summary of the changes that have been made since the last release.
-        user.login: This field contains the login name of the user who created the pull request. You can use this information to give credit to the individuals who contributed to the changes.
-        body: This field contains the description of the pull request, which provides more details about the changes made. You can use the description to provide a more detailed explanation of the changes that have been made.
-        created_at: This field contains the date that the pull request was created. You can use this date to provide a timeline of the changes made to the software.
-        html_url: This field contains the URL of the pull request on the GitHub website. You can use this URL to provide a link to the pull request, so that users can view more details about the changes made.
-
-        Then to generate the documentation:
-        Combining the information from both the GitHub API for commits and the GitHub API for pull requests can provide a more complete picture of the changes made to your software. Here are some suggestions on how to combine the fields from both APIs to generate a more robust change log:
-        Start by retrieving a list of commits made since the last release using the commits API. For each commit, extract the commit.message, commit.author.name, commit.author.date, and parents fields.
-        Use the parents field to identify which commits were made relative to which parent commits, so that you can identify the specific changes made in each commit.
-        For each commit, check if it is associated with a pull request by searching for the commit SHA in the head.sha field of the pull request API response. If a pull request is found, extract the title, user.login, body, created_at, state, and html_url fields from the pull request response.
-        Combine the information from the commits API and the pull requests API to generate a summary of the changes made to your software since the last release. You can use the commit messages to create a brief summary of the changes made, and use the pull request titles and descriptions to provide more detail. You can also use the pull request state (e.g. open, closed, merged) to identify which changes have been merged and which have not.
-        Organize the changes by category, such as new features, bug fixes, and performance improvements, to make it easier for users to understand what has changed.
-        By combining the information from both APIs, you can generate a more comprehensive change log that includes information about both the individual commits and the pull requests that they are associated with. This can provide a more complete picture of the changes made to your software and make it easier for users to understand what has changed since the last release.
-     `,
-        },
-        {
-          role: "user",
-          content: `Now, generate the documentation for the following: commit_payload: ${commit_messages}, pr_payload: ${pull_requests}}`,
+           Make each item of the generated content detailed using more than two or more sentences.
+          `,
         },
       ],
       temperature: 0.7,
