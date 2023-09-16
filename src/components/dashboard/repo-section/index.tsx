@@ -3,7 +3,6 @@ import { Stack } from "@chakra-ui/react";
 import { FormikHelpers } from "formik";
 import { useState } from "react";
 import { useDashboard } from "../provider";
-// import pick from "lodash/pick";
 import * as C from "./components";
 // import { useQuery } from "@tanstack/react-query";
 
@@ -80,15 +79,23 @@ export const RepoSection = () => {
       }));
 
     const commit_messages = !!requiresCommit
-      ? repoCommits?.map((item: any) => item.commit.message)
+      ? repoCommits?.map((item: any) => ({
+          author: item.commit.author.name,
+          description: item.commit.message,
+          timestamp: item.commit.author.date,
+        }))
       : undefined;
 
     const pull_requests = !!requiresPullRequests
-      ? repoPullRequests?.map(({ title, body }: any) => ({
-          title,
-          body,
+      ? repoPullRequests?.map((item: any) => ({
+          title: item.title,
+          description: item.body,
+          author: item.user.login,
+          timestamp: item.created_at,
         }))
       : undefined;
+
+    console.log({ commit_messages, pull_requests });
 
     const response = await fetch("/api/summarize", {
       method: "POST",
