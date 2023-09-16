@@ -22,6 +22,7 @@ import {
   MdOutlineArrowBackIos,
 } from "react-icons/md";
 import { useDashboard } from "../provider";
+import ReactMarkdown from "react-markdown";
 
 export type ConfigurationFormValues = {
   from: string[];
@@ -225,12 +226,40 @@ const RightSection = ({
             <Heading lineHeight="unset" fontSize="1.5rem">
               Summary
             </Heading>
-            <Box p="1rem" rounded="8px" borderWidth="1px">
-              {summary.split(". ").map((sentence, index) => (
-                <Stack spacing="1rem" key={index}>
-                  {sentence.length > 0 && <Box>{sentence}</Box>}
-                </Stack>
-              ))}
+            <Box p="1rem">
+              <ReactMarkdown
+                components={{
+                  a: (props) => (
+                    <Link
+                      color="#3525e6"
+                      target="_blank"
+                      href={props.href}
+                      rel="noopener noreferrer"
+                      style={{
+                        ...props.style,
+                        color: "#3525e6",
+                        fontWeight: 400,
+                        wordBreak: "break-word",
+                        textDecorationLine: "underline",
+                      }}
+                    >
+                      {props.children}
+                    </Link>
+                  ),
+                  p: ({ children, ...rest }) => (
+                    <Text py="2" wordBreak="break-word" color="gray.900">
+                      {children}
+                    </Text>
+                  ),
+                }}
+              >
+                {summary}
+              </ReactMarkdown>
+              {/* {summary.split(". ").map((sentence, index) => (
+                  <Stack spacing="1rem" key={index}>
+                    {sentence.length > 0 && <Box>{sentence}</Box>}
+                  </Stack>
+                ))} */}
             </Box>
           </Box>
         )}
