@@ -11,18 +11,12 @@ export default async function handler(
     const { accessToken } =
       (await getServerSession(req, res, authOptions)) ?? {};
 
-    const { repo_name, state, owner } = req.query;
-
-    const { data } = await axios.get(
-      `${process.env.GITHUB_BASE_URL}/repos/${owner}/${repo_name}/pulls`,
-      {
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${accessToken}`,
-        },
-        params: { state },
-      }
-    );
+    const { data } = await axios.get(`${process.env.CLICKUP_BASE_URL}/team`, {
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `${accessToken}`,
+      },
+    });
     res.status(200).json(data);
   } catch (error) {
     res.status(500).json({ error: "An error occured" });

@@ -9,10 +9,11 @@ import {
   Text,
   VisuallyHidden,
 } from "@chakra-ui/react";
-import { signIn } from "next-auth/react";
-import { FaGithub, FaPlay } from "react-icons/fa";
+import { useRouter } from "next/router";
+import { FaPlay } from "react-icons/fa";
 
 export const Hero = () => {
+  const { push } = useRouter();
   return (
     <Box as="section" bg="gray.800" color="white" py="4rem">
       <Box
@@ -52,10 +53,9 @@ export const Hero = () => {
               fontSize="md"
               fontWeight="bold"
               colorScheme="blue"
-              leftIcon={<FaGithub />}
-              onClick={() => signIn()}
+              onClick={() => push("/login")}
             >
-              Get started with Github
+              Get started
             </Button>
           </LightMode>
         </Stack>
