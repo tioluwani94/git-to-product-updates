@@ -93,6 +93,7 @@ export const authOptions = {
       const { account, token, profile } = options;
       if (account) {
         token.accessToken = account.access_token;
+        token.provider = account.provider;
       }
       if (profile) {
         token.profile = profile;
@@ -102,7 +103,7 @@ export const authOptions = {
     async session({ session, token }: any) {
       session.accessToken = token.accessToken;
       session.profile = token.profile;
-      console.log(session);
+      session.provider = token.provider;
       return session;
     },
   },

@@ -8,7 +8,7 @@ import { SiClickup } from "react-icons/si";
 const LoginPage = () => {
   useAuth("/login");
   return (
-    <Box h="100%" bg="gray.800" py={{ base: "12", md: "24" }}>
+    <Box h="100vh" bg="gray.800" py={{ base: "12", md: "24" }}>
       <Container
         maxW="md"
         bg="white"

@@ -8,7 +8,11 @@ export const useAuth = (route?: string) => {
 
   useEffect(() => {
     if (status === "authenticated") {
-      push("/dashboard");
+      if (session.provider === "clickup") {
+        push("/dashboard/clickup");
+      } else {
+        push("/dashboard");
+      }
     } else {
       push(route ?? "/");
     }
