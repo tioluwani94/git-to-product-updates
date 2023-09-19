@@ -9,6 +9,7 @@ export default async function handler(
 ) {
   try {
     const { accessToken } =
+      //@ts-ignore
       (await getServerSession(req, res, authOptions)) ?? {};
 
     const { folder_id } = req.query;

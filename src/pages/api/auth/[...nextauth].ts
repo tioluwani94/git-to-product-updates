@@ -108,4 +108,6 @@ export const authOptions = {
     },
   },
 };
+
+//@ts-ignore
 export default NextAuth(authOptions);

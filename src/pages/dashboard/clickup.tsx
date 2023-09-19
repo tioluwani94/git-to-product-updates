@@ -19,6 +19,7 @@ import {
   AccordionPanel,
   Box,
   Button,
+  Code,
   Container,
   FormControl,
   FormHelperText,
@@ -37,6 +38,7 @@ import {
   AutoCompleteInput,
   AutoCompleteItem,
   AutoCompleteList,
+  AutoCompleteTag,
 } from "@choc-ui/chakra-autocomplete";
 
 export default function ClickupPage() {
@@ -229,7 +231,8 @@ export default function ClickupPage() {
           <form onSubmit={handleSubmit}>
             <Stack spacing="4">
               <Heading size="sm">
-                Generate content from {list?.name} list
+                Generate content from <Code rounded="md">{list?.name}</Code>{" "}
+                list
               </Heading>
               <Stack spacing="8">
                 <FormControl>
@@ -263,21 +266,55 @@ export default function ClickupPage() {
                   <FormLabel color="gray.600">
                     What status do you use to represent completed tasks?
                   </FormLabel>
-                  <AutoComplete openOnFocus>
-                    <AutoCompleteInput variant="filled" />
-                    <AutoCompleteList>
-                      {[].map((country, cid) => (
+                  <AutoComplete
+                    multiple
+                    openOnFocus
+                    value={values.statuses}
+                    restoreOnBlurIfEmpty={false}
+                    onChange={(vals) =>
+                      setFieldValue("instructions.language", vals.join())
+                    }
+                  >
+                    <AutoCompleteInput
+                      rounded="sm"
+                      variant="filled"
+                      placeholder="Select status"
+                      sx={{
+                        ".chakra-input__group": {
+                          w: "auto",
+                        },
+                        ".chakra-wrap__list": {
+                          alignItems: "center",
+                        },
+                      }}
+                    >
+                      {({ tags }) =>
+                        tags.map((tag, tid) => (
+                          <AutoCompleteTag
+                            key={tid}
+                            label={tag.label}
+                            alignItems="center"
+                            onRemove={tag.onRemove}
+                          />
+                        ))
+                      }
+                    </AutoCompleteInput>
+                    <AutoCompleteList py="2">
+                      {list?.statuses?.map((s, id) => (
                         <AutoCompleteItem
-                          key={`option-${cid}`}
-                          value={country}
+                          bg="fg.muted"
+                          align="center"
+                          value={s.status}
+                          key={`option-${id}`}
                           textTransform="capitalize"
                         >
-                          {country}
+                          <Box rounded="full" boxSize="2" bg={s.color} />
+                          <Text ml="4">{s.status}</Text>
                         </AutoCompleteItem>
                       ))}
                     </AutoCompleteList>
                   </AutoComplete>
-                  <FormHelperText>
+                  <FormHelperText fontSize="xs">
                     Most teams use Closed, Completed, Deployed or Deployed to
                     production
                   </FormHelperText>

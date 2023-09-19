@@ -84,4 +84,10 @@ export interface ClickUpList {
   archived: boolean;
   override_statuses: boolean;
   permission_level: string;
+  statuses?: {
+    type: string;
+    color: string;
+    status: string;
+    orderindex: number;
+  }[];
 }

@@ -9,6 +9,7 @@ export default async function handler(
 ) {
   try {
     const { accessToken } =
+      //@ts-ignore
       (await getServerSession(req, res, authOptions)) ?? {};
 
     const { data } = await axios.get(`${process.env.CLICKUP_BASE_URL}/team`, {
