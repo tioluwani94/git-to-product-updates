@@ -75,7 +75,7 @@ export default function ClickupPage() {
     { enabled: !!selectedSpace }
   );
 
-  const { data: list } = useQuery<ClickUpList[]>(
+  const { data: list } = useQuery<ClickUpList>(
     ["clickup-list", selectedList],
     () => getList(selectedList ?? ""),
     { enabled: !!selectedList }
