@@ -11,13 +11,18 @@ export default async function handler(
     const { accessToken } =
       (await getServerSession(req, res, authOptions)) ?? {};
 
-    const { data } = await axios.get(`${process.env.CLICKUP_BASE_URL}/team`, {
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `${accessToken}`,
-      },
-    });
-    res.status(200).json(data);
+    const { team_id } = req.query;
+
+    const { data } = await axios.get(
+      `${process.env.CLICKUP_BASE_URL}/team/${team_id}/space`,
+      {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `${accessToken}`,
+        },
+      }
+    );
+    res.status(200).json(data.spaces);
   } catch (error) {
     res.status(500).json({ error: "An error occured" });
   }
