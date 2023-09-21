@@ -8,9 +8,16 @@ import {
   getFolders,
   getList,
   getSpaces,
+  getTasks,
   getTeams,
 } from "@/service/clickup";
-import { ClickUpFolder, ClickUpList, ClickUpSpace, ClickUpTeam } from "@/types";
+import {
+  ClickUpFolder,
+  ClickUpList,
+  ClickUpSpace,
+  ClickUpTeam,
+  ClickupTask,
+} from "@/types";
 import {
   Accordion,
   AccordionButton,
@@ -40,6 +47,8 @@ import {
   AutoCompleteList,
   AutoCompleteTag,
 } from "@choc-ui/chakra-autocomplete";
+import DatePicker from "@/components/date-picker";
+import format from "date-fns/format";
 
 export default function ClickupPage() {
   useAuth();
@@ -51,6 +60,16 @@ export default function ClickupPage() {
   const [selectedSpace, setSelectedSpace] = useState<string | undefined>(
     undefined
   );
+
+  const { values, handleSubmit, handleChange, setFieldValue } = useFormik({
+    onSubmit: console.log,
+    initialValues: {
+      type: "bugs",
+      statuses: [],
+      start_date: format(new Date(), "yyyy-MM-dd"),
+      end_date: format(new Date(), "yyyy-MM-dd"),
+    },
+  });
 
   const { data: teams, isLoading: isLoadingTeams } = useQuery<ClickUpTeam[]>(
     ["clickup-teams"],
@@ -83,13 +102,28 @@ export default function ClickupPage() {
     { enabled: !!selectedList }
   );
 
-  const { values, handleSubmit, handleChange, setFieldValue } = useFormik({
-    onSubmit: console.log,
-    initialValues: {
-      type: "bugs",
-      statuses: [],
-    },
-  });
+  const { data: tasks } = useQuery<ClickupTask[]>(
+    [
+      "clickup-list-task",
+      selectedList,
+      values.statuses,
+      values.start_date,
+      values.end_date,
+    ],
+    () =>
+      getTasks(selectedList ?? "", {
+        subtasks: true,
+        include_closed: true,
+        statuses: values.statuses,
+        // date_done_gt: values.start_date,
+        // date_done_lt: values.end_date,
+      }),
+    {
+      enabled: !!selectedList,
+    }
+  );
+
+  // console.log(tasks);
 
   const handleNext = () => {
     setSection(section + 1);
@@ -100,7 +134,7 @@ export default function ClickupPage() {
   };
 
   return (
-    <Box as="main">
+    <Box as="main" h="100vh">
       <Container maxW="lg" py="8">
         {section === 0 && (
           <Stack spacing="4">
@@ -271,11 +305,10 @@ export default function ClickupPage() {
                     openOnFocus
                     value={values.statuses}
                     restoreOnBlurIfEmpty={false}
-                    onChange={(vals) =>
-                      setFieldValue("instructions.language", vals.join())
-                    }
+                    onChange={(vals) => setFieldValue("statuses", vals)}
                   >
                     <AutoCompleteInput
+                      size="sm"
                       rounded="sm"
                       variant="filled"
                       placeholder="Select status"
@@ -319,6 +352,30 @@ export default function ClickupPage() {
                     production
                   </FormHelperText>
                 </FormControl>
+                <HStack>
+                  <FormControl>
+                    <FormLabel>Start date</FormLabel>
+                    <DatePicker
+                      value={values.start_date}
+                      inputProps={{ size: "sm" }}
+                      onChange={(value: any) =>
+                        setFieldValue("start_date", value)
+                      }
+                      disabled={{ after: new Date() }}
+                    />
+                  </FormControl>
+                  <FormControl>
+                    <FormLabel>End date</FormLabel>
+                    <DatePicker
+                      value={values.end_date}
+                      inputProps={{ size: "sm" }}
+                      onChange={(value: any) =>
+                        setFieldValue("end_date", value)
+                      }
+                      disabled={{ after: new Date() }}
+                    />
+                  </FormControl>
+                </HStack>
                 <HStack w="100%">
                   <Button
                     size="sm"

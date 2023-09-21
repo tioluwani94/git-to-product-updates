@@ -91,3 +91,46 @@ export interface ClickUpList {
     orderindex: number;
   }[];
 }
+
+export interface ClickupTask {
+  id: string;
+  name: string;
+  status: {
+    status: string;
+    color: string;
+    orderindex: number;
+    type: string;
+  };
+  orderindex: string;
+  date_created: string;
+  date_updated: string;
+  date_closed: string | null;
+  date_done: string | null;
+  creator: {
+    id: number;
+    username: string;
+    color: string;
+    profilePicture: string;
+  };
+  assignees: string[];
+  checklists: string[];
+  tags: string[];
+  parent: string | null;
+  priority: string | null;
+  due_date: string | null;
+  start_date: string | null;
+  time_estimate: string | null;
+  time_spent: string | null;
+  list: {
+    id: string;
+  };
+  folder: {
+    id: string;
+  };
+  space: {
+    id: string;
+  };
+  url: string;
+  text_content?: string;
+  description?: string;
+}

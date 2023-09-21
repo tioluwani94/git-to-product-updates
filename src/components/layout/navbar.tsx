@@ -29,6 +29,7 @@ export const Navbar = () => {
     "/": "gray.800",
     "/login": "gray.800",
     "/dashboard": "bg-surface",
+    "/dashboard/clickup": "bg-surface",
   };
 
   const logoColor: { [key: string]: string } = {

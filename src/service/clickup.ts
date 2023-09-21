@@ -37,3 +37,20 @@ export const getList = async (list_id: string) => {
   const { data } = await axios.get(`/api/clickup/list/${list_id}`);
   return data;
 };
+
+export const getTasks = async (
+  list_id: string,
+  params?: {
+    page?: number;
+    subtasks?: boolean;
+    statuses?: string[];
+    date_done_gt?: number;
+    date_done_lt?: number;
+    include_closed?: boolean;
+  }
+) => {
+  const { data } = await axios.get(`/api/clickup/task/list/${list_id}`, {
+    params,
+  });
+  return data;
+};
