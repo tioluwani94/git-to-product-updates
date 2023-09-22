@@ -1,12 +1,9 @@
-import { Logo } from "@/components/layout/logo";
-import { useAuth } from "@/hooks/auth";
 import { Box, Button, Container, Heading, Stack } from "@chakra-ui/react";
 import { signIn } from "next-auth/react";
 import { FaGithub } from "react-icons/fa";
 import { SiClickup } from "react-icons/si";
 
 const LoginPage = () => {
-  useAuth("/login");
   return (
     <Box h="100vh" bg="gray.800" py={{ base: "12", md: "24" }}>
       <Container
@@ -26,7 +23,11 @@ const LoginPage = () => {
           <Stack spacing="4">
             <Button
               variant="secondary"
-              onClick={() => signIn("clickup")}
+              onClick={() =>
+                signIn("clickup", {
+                  callbackUrl: `${process.env.NEXT_PUBLIC_URL}dashboard/clickup`,
+                })
+              }
               transition="background-image ease-in 0.2s"
               leftIcon={<SiClickup color="inherit" />}
               _hover={{
@@ -41,7 +42,11 @@ const LoginPage = () => {
             <Button
               variant="secondary"
               leftIcon={<FaGithub />}
-              onClick={() => signIn("github")}
+              onClick={() =>
+                signIn("github", {
+                  callbackUrl: `${process.env.NEXT_PUBLIC_URL}dashboard`,
+                })
+              }
             >
               Continue with Github
             </Button>

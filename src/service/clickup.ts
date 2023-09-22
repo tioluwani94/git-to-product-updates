@@ -1,3 +1,4 @@
+import { appendObjToUrl } from "@/utils/functions";
 import axios from "axios";
 
 export const getTeams = async () => {
@@ -42,6 +43,7 @@ export const getTasks = async (
   list_id: string,
   params?: {
     page?: number;
+    archived?: boolean;
     subtasks?: boolean;
     statuses?: string[];
     date_done_gt?: number;
@@ -49,8 +51,9 @@ export const getTasks = async (
     include_closed?: boolean;
   }
 ) => {
-  const { data } = await axios.get(`/api/clickup/task/list/${list_id}`, {
-    params,
-  });
+  const url = `/api/clickup/task/list/${list_id}?${appendObjToUrl(
+    params ?? {}
+  )}`;
+  const { data } = await axios.get(url);
   return data;
 };

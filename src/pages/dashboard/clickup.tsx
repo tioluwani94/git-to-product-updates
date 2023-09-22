@@ -1,8 +1,8 @@
+import DatePicker from "@/components/date-picker";
 import {
   RadioCard,
   RadioCardGroup,
 } from "@/components/layout/radio-card-group";
-import { useAuth } from "@/hooks/auth";
 import {
   getFolderlessLists,
   getFolders,
@@ -37,9 +37,6 @@ import {
   Stack,
   Text,
 } from "@chakra-ui/react";
-import { useQuery } from "@tanstack/react-query";
-import { useFormik } from "formik";
-import React, { useState } from "react";
 import {
   AutoComplete,
   AutoCompleteInput,
@@ -47,12 +44,13 @@ import {
   AutoCompleteList,
   AutoCompleteTag,
 } from "@choc-ui/chakra-autocomplete";
-import DatePicker from "@/components/date-picker";
+import { useQuery } from "@tanstack/react-query";
 import format from "date-fns/format";
+import getUnixTime from "date-fns/getUnixTime";
+import { useFormik } from "formik";
+import { useState } from "react";
 
 export default function ClickupPage() {
-  useAuth();
-
   const [section, setSection] = useState(0);
   const [selectedList, setSelectedList] = useState<string | undefined>(
     undefined
@@ -112,18 +110,15 @@ export default function ClickupPage() {
     ],
     () =>
       getTasks(selectedList ?? "", {
-        subtasks: true,
-        include_closed: true,
+        archived: false,
         statuses: values.statuses,
-        // date_done_gt: values.start_date,
-        // date_done_lt: values.end_date,
+        // date_done_lt: getUnixTime(new Date(values.end_date)),
+        // date_done_gt: getUnixTime(new Date(values.start_date)),
       }),
     {
       enabled: !!selectedList,
     }
   );
-
-  // console.log(tasks);
 
   const handleNext = () => {
     setSection(section + 1);
@@ -404,3 +399,5 @@ export default function ClickupPage() {
     </Box>
   );
 }
+
+ClickupPage.auth = true;

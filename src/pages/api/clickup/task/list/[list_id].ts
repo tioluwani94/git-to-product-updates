@@ -16,34 +16,34 @@ export default async function handler(
       list_id,
       page,
       subtasks,
-      statuses,
+      statuses: s,
+      archived,
       date_done_gt,
       date_done_lt,
       include_closed,
     } = req.query;
 
-    console.log(req.query);
+    const statuses = !s ? undefined : Array.isArray(s) ? s : [s];
 
-    const { data } = await axios.get(
-      `${process.env.CLICKUP_BASE_URL}/list/${list_id}/task`,
-      {
-        params: {
-          page,
-          subtasks,
-          statuses,
-          date_done_gt,
-          date_done_lt,
-          include_closed,
-        },
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `${accessToken}`,
-        },
-      }
-    );
+    const baseURL = `${process.env.CLICKUP_BASE_URL}/list/${list_id}/task`;
+
+    const { data } = await axios.get(baseURL, {
+      params: {
+        page,
+        subtasks,
+        archived,
+        date_done_gt,
+        date_done_lt,
+        include_closed,
+        ...statuses?.reduce((a, c, i) => ({ ...a, [`statuses[${i}]`]: c }), {}),
+      },
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `${accessToken}`,
+      },
+    });
     res.status(200).json(data.tasks);
   } catch (error) {
-    console.log(error);
     res.status(500).json({ error: "An error occured" });
   }
 }

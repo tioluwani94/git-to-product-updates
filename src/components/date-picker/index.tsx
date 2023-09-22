@@ -1,4 +1,11 @@
-import { Box, InputProps, useDisclosure, Input } from "@chakra-ui/react";
+import {
+  Box,
+  InputProps,
+  useDisclosure,
+  Input,
+  InputGroup,
+  InputLeftElement,
+} from "@chakra-ui/react";
 import { format, isValid, parse } from "date-fns";
 import { ChangeEventHandler, useEffect, useState } from "react";
 import { ClassNames, DayPicker, DayPickerSingleProps } from "react-day-picker";
@@ -58,15 +65,19 @@ export default function DatePicker({
 
   return (
     <Box width="100%" position="relative">
-      <Input
-        onFocus={onOpen}
-        value={inputValue}
-        onMouseDown={onOpen}
-        onChange={handleInputChange}
-        placeholder={format(new Date(), "yyyy-MM-dd")}
-        rightIcon={<FiCalendar boxSize="0.8rem" color="gray.400" />}
-        {...inputProps}
-      />
+      <InputGroup size={inputProps.size}>
+        <InputLeftElement>
+          <FiCalendar size="0.8rem" color="gray.400" />
+        </InputLeftElement>
+        <Input
+          onFocus={onOpen}
+          value={inputValue}
+          onMouseDown={onOpen}
+          onChange={handleInputChange}
+          placeholder={format(new Date(), "yyyy-MM-dd")}
+          {...inputProps}
+        />
+      </InputGroup>
       {isOpen && (
         <OutsideClickHandler
           zIndex={1000000}

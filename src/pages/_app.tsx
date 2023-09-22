@@ -12,6 +12,7 @@ import {
   QueryClientProvider,
 } from "@tanstack/react-query";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
+import { ProtectedRoute } from "@/components/protected";
 
 export default function App({
   Component,
@@ -37,6 +38,20 @@ export default function App({
           state={pageProps.dehydratedState}
         >
           <ChakraProvider theme={theme}>
+            {
+              //@ts-ignore
+              Component.auth ? (
+                <ProtectedRoute>
+                  <AppLayout>
+                    <Component {...pageProps} />
+                  </AppLayout>
+                </ProtectedRoute>
+              ) : (
+                <AppLayout>
+                  <Component {...pageProps} />
+                </AppLayout>
+              )
+            }
             <AppLayout>
               <Component {...pageProps} />
             </AppLayout>
