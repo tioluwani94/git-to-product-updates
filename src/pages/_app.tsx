@@ -30,13 +30,13 @@ export default function App({
   );
 
   return (
-    <SessionProvider session={session}>
-      <QueryClientProvider client={queryClient}>
-        <ReactQueryDevtools position="bottom-left" initialIsOpen={false} />
-        <Hydrate
-          //@ts-ignore
-          state={pageProps.dehydratedState}
-        >
+    <QueryClientProvider client={queryClient}>
+      <ReactQueryDevtools position="bottom-left" initialIsOpen={false} />
+      <Hydrate
+        //@ts-ignore
+        state={pageProps.dehydratedState}
+      >
+        <SessionProvider session={session}>
           <ChakraProvider theme={theme}>
             {
               //@ts-ignore
@@ -52,13 +52,10 @@ export default function App({
                 </AppLayout>
               )
             }
-            <AppLayout>
-              <Component {...pageProps} />
-            </AppLayout>
-            <Analytics mode="production" />
           </ChakraProvider>
-        </Hydrate>
-      </QueryClientProvider>
-    </SessionProvider>
+        </SessionProvider>
+        <Analytics mode="production" />
+      </Hydrate>
+    </QueryClientProvider>
   );
 }
