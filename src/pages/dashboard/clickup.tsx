@@ -1,4 +1,9 @@
+/* eslint-disable react/no-unescaped-entities */
 import DatePicker from "@/components/date-picker";
+import {
+  CheckboxCard,
+  CheckboxCardGroup,
+} from "@/components/layout/checkbox-card-group";
 import {
   RadioCard,
   RadioCardGroup,
@@ -33,6 +38,8 @@ import {
   FormLabel,
   HStack,
   Heading,
+  Input,
+  Link,
   Skeleton,
   Stack,
   Text,
@@ -45,29 +52,24 @@ import {
   AutoCompleteTag,
 } from "@choc-ui/chakra-autocomplete";
 import { useQuery } from "@tanstack/react-query";
-import format from "date-fns/format";
-import getUnixTime from "date-fns/getUnixTime";
-import { useFormik } from "formik";
 import { useState } from "react";
+import ReactMarkdown from "react-markdown";
 
 export default function ClickupPage() {
+  const [type, setType] = useState("bugs");
   const [section, setSection] = useState(0);
+  const [summary, setSummary] = useState("");
+  const [end_date, setEndDate] = useState<string[]>([]);
+  const [statuses, setStatuses] = useState<string[]>([]);
+  const [start_date, setStartDate] = useState<string[]>([]);
+  const [selectedTasks, setSelectedTasks] = useState<string[]>([]);
+  const [isGeneratingContent, setIsGeneratingConent] = useState(false);
   const [selectedList, setSelectedList] = useState<string | undefined>(
     undefined
   );
   const [selectedSpace, setSelectedSpace] = useState<string | undefined>(
     undefined
   );
-
-  const { values, handleSubmit, handleChange, setFieldValue } = useFormik({
-    onSubmit: console.log,
-    initialValues: {
-      type: "bugs",
-      statuses: [],
-      start_date: format(new Date(), "yyyy-MM-dd"),
-      end_date: format(new Date(), "yyyy-MM-dd"),
-    },
-  });
 
   const { data: teams, isLoading: isLoadingTeams } = useQuery<ClickUpTeam[]>(
     ["clickup-teams"],
@@ -100,25 +102,60 @@ export default function ClickupPage() {
     { enabled: !!selectedList }
   );
 
-  const { data: tasks } = useQuery<ClickupTask[]>(
-    [
-      "clickup-list-task",
-      selectedList,
-      values.statuses,
-      values.start_date,
-      values.end_date,
-    ],
+  const { data: tasks, isLoading: isLoadingTasks } = useQuery<ClickupTask[]>(
+    ["clickup-list-task", selectedList, statuses, start_date, end_date],
     () =>
       getTasks(selectedList ?? "", {
         archived: false,
-        statuses: values.statuses,
-        // date_done_lt: getUnixTime(new Date(values.end_date)),
-        // date_done_gt: getUnixTime(new Date(values.start_date)),
+        statuses: statuses,
+        // date_done_lt: getUnixTime(new Date(end_date)),
+        // date_done_gt: getUnixTime(new Date(start_date)),
       }),
     {
-      enabled: !!selectedList,
+      enabled: !!selectedList && !!statuses.length,
     }
   );
+  const handleGenerateContent = async () => {
+    setSummary("");
+    setIsGeneratingConent(true);
+
+    const response = await fetch("/api/clickup/generate-content", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        tasks: tasks
+          ?.filter((t) => selectedTasks.includes(t.id))
+          .map((t) => ({
+            title: t.name,
+            description: t.description ?? t.text_content,
+          })),
+      }),
+    });
+
+    if (!response.ok) {
+      console.log("error", response.statusText);
+      return;
+    }
+
+    const data = response.body;
+    if (!data) {
+      return;
+    }
+
+    const reader = data.getReader();
+    const decoder = new TextDecoder();
+    let done = false;
+
+    while (!done) {
+      const { value, done: doneReading } = await reader.read();
+      done = doneReading;
+      const chunkValue = decoder.decode(value);
+      setSummary((prev) => prev + chunkValue);
+    }
+    setIsGeneratingConent(false);
+  };
 
   const handleNext = () => {
     setSection(section + 1);
@@ -129,7 +166,7 @@ export default function ClickupPage() {
   };
 
   return (
-    <Box as="main" h="100vh">
+    <Box as="main">
       <Container maxW="lg" py="8">
         {section === 0 && (
           <Stack spacing="4">
@@ -257,12 +294,11 @@ export default function ClickupPage() {
           </Stack>
         )}
         {section === 2 && (
-          <form onSubmit={handleSubmit}>
-            <Stack spacing="4">
-              <Heading size="sm">
-                Generate content from <Code rounded="md">{list?.name}</Code>{" "}
-                list
-              </Heading>
+          <Stack spacing="4">
+            <Heading size="sm">
+              Generate content from <Code rounded="md">{list?.name}</Code> list
+            </Heading>
+            <Box>
               <Stack spacing="8">
                 <FormControl>
                   <FormLabel color="gray.600">
@@ -271,9 +307,9 @@ export default function ClickupPage() {
                   <RadioCardGroup
                     w="100%"
                     name="type"
-                    value={values.type}
+                    value={type}
+                    onChange={(v) => setType(v)}
                     direction={{ base: "column", md: "row" }}
-                    onChange={(v) => setFieldValue("type", v)}
                   >
                     {[
                       { value: "bugs", label: "Bug Fixes" },
@@ -282,7 +318,9 @@ export default function ClickupPage() {
                       <RadioCard
                         key={i.value}
                         value={i.value}
-                        containerProps={{ width: { base: "100%", md: "50%" } }}
+                        containerProps={{
+                          width: { base: "100%", md: "50%" },
+                        }}
                       >
                         <Text fontSize="sm" fontWeight="medium">
                           {i.label}
@@ -298,9 +336,10 @@ export default function ClickupPage() {
                   <AutoComplete
                     multiple
                     openOnFocus
-                    value={values.statuses}
+                    closeOnSelect
+                    value={statuses}
                     restoreOnBlurIfEmpty={false}
-                    onChange={(vals) => setFieldValue("statuses", vals)}
+                    onChange={(vals) => setStatuses(vals)}
                   >
                     <AutoCompleteInput
                       size="sm"
@@ -351,27 +390,64 @@ export default function ClickupPage() {
                   <FormControl>
                     <FormLabel>Start date</FormLabel>
                     <DatePicker
-                      value={values.start_date}
+                      value={start_date}
                       inputProps={{ size: "sm" }}
-                      onChange={(value: any) =>
-                        setFieldValue("start_date", value)
-                      }
                       disabled={{ after: new Date() }}
+                      onChange={(value: any) => setStartDate(value)}
                     />
                   </FormControl>
                   <FormControl>
                     <FormLabel>End date</FormLabel>
                     <DatePicker
-                      value={values.end_date}
+                      value={end_date}
                       inputProps={{ size: "sm" }}
-                      onChange={(value: any) =>
-                        setFieldValue("end_date", value)
-                      }
                       disabled={{ after: new Date() }}
+                      onChange={(value: any) => setEndDate(value)}
                     />
                   </FormControl>
                 </HStack>
-                <HStack w="100%">
+                {isLoadingTasks && !!statuses.length && (
+                  <Text>Fetching tasks...</Text>
+                )}
+                {tasks && !!tasks.length && (
+                  <Stack spacing="6">
+                    <Text
+                      fontSize="lg"
+                      fontWeight="medium"
+                      color="fg.emphasized"
+                    >
+                      Select the taks you'll like to generate content from
+                    </Text>
+                    <CheckboxCardGroup
+                      spacing="3"
+                      value={selectedTasks}
+                      onChange={(v) => setSelectedTasks(v)}
+                    >
+                      {tasks.map((t) => (
+                        <CheckboxCard key={t.id} value={t.id}>
+                          <Text
+                            fontSize="sm"
+                            fontWeight="medium"
+                            color="fg.emphasized"
+                          >
+                            {t.name}
+                          </Text>
+                          <Text
+                            width="350px"
+                            textStyle="sm"
+                            color="fg.muted"
+                            overflow="hidden"
+                            whiteSpace="nowrap"
+                            textOverflow="ellipsis"
+                          >
+                            {t.description ?? t.text_content}
+                          </Text>
+                        </CheckboxCard>
+                      ))}
+                    </CheckboxCardGroup>
+                  </Stack>
+                )}
+                <Stack w="100%" direction={{ base: "column", md: "row" }}>
                   <Button
                     size="sm"
                     type="button"
@@ -387,13 +463,48 @@ export default function ClickupPage() {
                     colorScheme="blue"
                     order={{ base: 1, md: 2 }}
                     w={{ base: "100%", md: "50%" }}
+                    onClick={handleGenerateContent}
+                    isLoading={isGeneratingContent}
+                    isDisabled={!selectedTasks?.length}
                   >
                     Generate content
                   </Button>
-                </HStack>
+                </Stack>
               </Stack>
-            </Stack>
-          </form>
+            </Box>
+            {summary && (
+              <Box bg="white" p="4" rounded="sm">
+                <ReactMarkdown
+                  components={{
+                    a: (props) => (
+                      <Link
+                        color="#3525e6"
+                        target="_blank"
+                        href={props.href}
+                        rel="noopener noreferrer"
+                        style={{
+                          ...props.style,
+                          color: "#3525e6",
+                          fontWeight: 400,
+                          wordBreak: "break-word",
+                          textDecorationLine: "underline",
+                        }}
+                      >
+                        {props.children}
+                      </Link>
+                    ),
+                    p: ({ children, ...rest }) => (
+                      <Text py="2" wordBreak="break-word" color="gray.900">
+                        {children}
+                      </Text>
+                    ),
+                  }}
+                >
+                  {summary}
+                </ReactMarkdown>
+              </Box>
+            )}
+          </Stack>
         )}
       </Container>
     </Box>

@@ -6,9 +6,7 @@ export const AppLayout = ({ children }: { children: ReactNode }) => {
   return (
     <Flex flexDirection="column">
       <Navbar />
-      <Box flex={1} overflowY="auto">
-        {children}
-      </Box>
+      <Box flex={1}>{children}</Box>
     </Flex>
   );
 };
