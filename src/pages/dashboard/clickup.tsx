@@ -29,6 +29,7 @@ import {
   AccordionIcon,
   AccordionItem,
   AccordionPanel,
+  Badge,
   Box,
   Button,
   Code,
@@ -167,7 +168,7 @@ export default function ClickupPage() {
 
   return (
     <Box as="main">
-      <Container maxW="lg" py="8">
+      <Container maxW="xl" py="8">
         {section === 0 && (
           <Stack spacing="4">
             <Heading size="sm">Select a space</Heading>
@@ -416,7 +417,7 @@ export default function ClickupPage() {
                       fontWeight="medium"
                       color="fg.emphasized"
                     >
-                      Select the taks you'll like to generate content from
+                      Select the tasks you'll like to generate content from
                     </Text>
                     <CheckboxCardGroup
                       spacing="3"
@@ -426,22 +427,37 @@ export default function ClickupPage() {
                       {tasks.map((t) => (
                         <CheckboxCard key={t.id} value={t.id}>
                           <Text
+                            mb="2"
                             fontSize="sm"
                             fontWeight="medium"
                             color="fg.emphasized"
                           >
                             {t.name}
                           </Text>
-                          <Text
-                            width="350px"
-                            textStyle="sm"
-                            color="fg.muted"
-                            overflow="hidden"
-                            whiteSpace="nowrap"
-                            textOverflow="ellipsis"
+                          {(t.description || t.text_content) && (
+                            <Text
+                              mt="2"
+                              width="350px"
+                              textStyle="sm"
+                              color="fg.muted"
+                              overflow="hidden"
+                              whiteSpace="nowrap"
+                              textOverflow="ellipsis"
+                            >
+                              {t.description ?? t.text_content}
+                            </Text>
+                          )}
+                          {/* {statuses.length > 1 && ( */}
+                          <Badge
+                            mt="2"
+                            size="sm"
+                            w="fit-content"
+                            display="block"
+                            bg={t.status.color}
                           >
-                            {t.description ?? t.text_content}
-                          </Text>
+                            {t.status.status}
+                          </Badge>
+                          {/* )} */}
                         </CheckboxCard>
                       ))}
                     </CheckboxCardGroup>
@@ -473,7 +489,10 @@ export default function ClickupPage() {
               </Stack>
             </Box>
             {summary && (
-              <Box bg="white" p="4" rounded="sm">
+              <Stack bg="white" p="4" rounded="sm">
+                <Text fontSize="lg" fontWeight="medium" color="fg.emphasized">
+                  Generated content
+                </Text>
                 <ReactMarkdown
                   components={{
                     a: (props) => (
@@ -502,7 +521,7 @@ export default function ClickupPage() {
                 >
                   {summary}
                 </ReactMarkdown>
-              </Box>
+              </Stack>
             )}
           </Stack>
         )}
