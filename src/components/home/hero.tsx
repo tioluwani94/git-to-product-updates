@@ -31,11 +31,13 @@ export const Hero = () => {
             letterSpacing="tight"
             fontWeight="extrabold"
           >
-            AI-generated release notes from your Git commits, PRs and Changelogs
+            AI-generated product announcements from your Git commits, PRs and
+            Changelogs
           </Heading>
           <Text fontSize="xl" mt="4" maxW="xl" mx="auto">
             Simplify your release process and generate polished, detailed
-            release notes with the help of our AI-powered changelog assistant
+            product announcements with the help of our AI-powered changelog
+            assistant
           </Text>
         </Box>
 

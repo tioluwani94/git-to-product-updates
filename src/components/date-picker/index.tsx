@@ -59,8 +59,10 @@ export default function DatePicker({
   };
 
   useEffect(() => {
-    setInputValue(value);
-    setSelected(new Date(value));
+    if (value) {
+      setInputValue(value);
+      setSelected(new Date(value));
+    }
   }, [value]);
 
   return (

@@ -23,6 +23,7 @@ import {
   ClickUpTeam,
   ClickupTask,
 } from "@/types";
+import { contentTypeRegister } from "@/utils/data";
 import {
   Accordion,
   AccordionButton,
@@ -33,6 +34,7 @@ import {
   Box,
   Button,
   Code,
+  Collapse,
   Container,
   FormControl,
   FormHelperText,
@@ -53,24 +55,28 @@ import {
   AutoCompleteTag,
 } from "@choc-ui/chakra-autocomplete";
 import { useQuery } from "@tanstack/react-query";
-import { useState } from "react";
+import getUnixTime from "date-fns/getUnixTime";
+import { useEffect, useRef, useState } from "react";
 import ReactMarkdown from "react-markdown";
 
 export default function ClickupPage() {
-  const [type, setType] = useState("bugs");
   const [section, setSection] = useState(0);
   const [summary, setSummary] = useState("");
-  const [end_date, setEndDate] = useState<string[]>([]);
   const [statuses, setStatuses] = useState<string[]>([]);
-  const [start_date, setStartDate] = useState<string[]>([]);
+  const [content_type, setContentType] = useState("bugs");
   const [selectedTasks, setSelectedTasks] = useState<string[]>([]);
+  const [product_description, setProductDescription] = useState("");
   const [isGeneratingContent, setIsGeneratingConent] = useState(false);
+  const [end_date, setEndDate] = useState<string | undefined>(undefined);
+  const [start_date, setStartDate] = useState<string | undefined>(undefined);
   const [selectedList, setSelectedList] = useState<string | undefined>(
     undefined
   );
   const [selectedSpace, setSelectedSpace] = useState<string | undefined>(
     undefined
   );
+
+  const productDescriptionInputRef = useRef<HTMLInputElement>(null);
 
   const { data: teams, isLoading: isLoadingTeams } = useQuery<ClickUpTeam[]>(
     ["clickup-teams"],
@@ -109,8 +115,10 @@ export default function ClickupPage() {
       getTasks(selectedList ?? "", {
         archived: false,
         statuses: statuses,
-        // date_done_lt: getUnixTime(new Date(end_date)),
-        // date_done_gt: getUnixTime(new Date(start_date)),
+        date_done_lt: end_date ? getUnixTime(new Date(end_date)) : undefined,
+        date_done_gt: start_date
+          ? getUnixTime(new Date(start_date))
+          : undefined,
       }),
     {
       enabled: !!selectedList && !!statuses.length,
@@ -126,6 +134,8 @@ export default function ClickupPage() {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
+        content_type,
+        product_description,
         tasks: tasks
           ?.filter((t) => selectedTasks.includes(t.id))
           .map((t) => ({
@@ -165,6 +175,12 @@ export default function ClickupPage() {
   const handlePrevious = () => {
     setSection(section - 1);
   };
+
+  useEffect(() => {
+    if (productDescriptionInputRef.current && section === 2) {
+      productDescriptionInputRef.current.focus();
+    }
+  }, [section]);
 
   return (
     <Box as="main">
@@ -299,95 +315,105 @@ export default function ClickupPage() {
             <Heading size="sm">
               Generate content from <Code rounded="md">{list?.name}</Code> list
             </Heading>
-            <Box>
-              <Stack spacing="8">
-                <FormControl>
-                  <FormLabel color="gray.600">
-                    What type of content do you want to create?
-                  </FormLabel>
-                  <RadioCardGroup
-                    w="100%"
-                    name="type"
-                    value={type}
-                    onChange={(v) => setType(v)}
-                    direction={{ base: "column", md: "row" }}
-                  >
-                    {[
-                      { value: "bugs", label: "Bug Fixes" },
-                      { value: "features", label: "Feature updates" },
-                    ].map((i) => (
-                      <RadioCard
-                        key={i.value}
-                        value={i.value}
-                        containerProps={{
-                          width: { base: "100%", md: "50%" },
-                        }}
-                      >
-                        <Text fontSize="sm" fontWeight="medium">
-                          {i.label}
-                        </Text>
-                      </RadioCard>
-                    ))}
-                  </RadioCardGroup>
-                </FormControl>
-                <FormControl>
-                  <FormLabel color="gray.600">
-                    What status do you use to represent completed tasks?
-                  </FormLabel>
-                  <AutoComplete
-                    multiple
-                    openOnFocus
-                    closeOnSelect
-                    value={statuses}
-                    restoreOnBlurIfEmpty={false}
-                    onChange={(vals) => setStatuses(vals)}
-                  >
-                    <AutoCompleteInput
-                      size="sm"
-                      rounded="sm"
-                      variant="filled"
-                      placeholder="Select status"
-                      sx={{
-                        ".chakra-input__group": {
-                          w: "auto",
-                        },
-                        ".chakra-wrap__list": {
-                          alignItems: "center",
-                        },
+            <Stack spacing="8">
+              <FormControl>
+                <FormLabel>Give a short description of your product</FormLabel>
+                <Input
+                  size="sm"
+                  type="text"
+                  value={product_description}
+                  ref={productDescriptionInputRef}
+                  onChange={(e) => setProductDescription(e.target.value)}
+                />
+              </FormControl>
+              <FormControl>
+                <FormLabel color="gray.600">
+                  What type of content do you want to create?
+                </FormLabel>
+                <RadioCardGroup
+                  w="100%"
+                  name="type"
+                  value={content_type}
+                  onChange={(v) => setContentType(v)}
+                  direction={{ base: "column", md: "row" }}
+                >
+                  {Object.keys(contentTypeRegister).map((k) => (
+                    <RadioCard
+                      key={k}
+                      value={k}
+                      containerProps={{
+                        width: { base: "100%", md: "50%" },
                       }}
                     >
-                      {({ tags }) =>
-                        tags.map((tag, tid) => (
-                          <AutoCompleteTag
-                            key={tid}
-                            label={tag.label}
-                            alignItems="center"
-                            onRemove={tag.onRemove}
-                          />
-                        ))
-                      }
-                    </AutoCompleteInput>
-                    <AutoCompleteList py="2">
-                      {list?.statuses?.map((s, id) => (
-                        <AutoCompleteItem
-                          bg="fg.muted"
-                          align="center"
-                          value={s.status}
-                          key={`option-${id}`}
-                          textTransform="capitalize"
-                        >
-                          <Box rounded="full" boxSize="2" bg={s.color} />
-                          <Text ml="4">{s.status}</Text>
-                        </AutoCompleteItem>
-                      ))}
-                    </AutoCompleteList>
-                  </AutoComplete>
-                  <FormHelperText fontSize="xs">
-                    Most teams use Closed, Completed, Deployed or Deployed to
-                    production
-                  </FormHelperText>
-                </FormControl>
-                <HStack>
+                      <Text fontSize="sm" fontWeight="medium">
+                        {contentTypeRegister[k]}
+                      </Text>
+                    </RadioCard>
+                  ))}
+                </RadioCardGroup>
+              </FormControl>
+              <FormControl>
+                <FormLabel color="gray.600">
+                  What status do you use to represent completed tasks?
+                </FormLabel>
+                <AutoComplete
+                  multiple
+                  openOnFocus
+                  closeOnSelect
+                  value={statuses}
+                  restoreOnBlurIfEmpty={false}
+                  onChange={(vals) => setStatuses(vals)}
+                >
+                  <AutoCompleteInput
+                    size="sm"
+                    rounded="sm"
+                    variant="filled"
+                    placeholder="Select status"
+                    sx={{
+                      ".chakra-input__group": {
+                        w: "auto",
+                      },
+                      ".chakra-wrap__list": {
+                        alignItems: "center",
+                      },
+                    }}
+                  >
+                    {({ tags }) =>
+                      tags.map((tag, tid) => (
+                        <AutoCompleteTag
+                          key={tid}
+                          label={tag.label}
+                          alignItems="center"
+                          onRemove={tag.onRemove}
+                        />
+                      ))
+                    }
+                  </AutoCompleteInput>
+                  <AutoCompleteList py="2">
+                    {list?.statuses?.map((s, id) => (
+                      <AutoCompleteItem
+                        bg="fg.muted"
+                        align="center"
+                        value={s.status}
+                        key={`option-${id}`}
+                        textTransform="capitalize"
+                      >
+                        <Box rounded="full" boxSize="2" bg={s.color} />
+                        <Text ml="4">{s.status}</Text>
+                      </AutoCompleteItem>
+                    ))}
+                  </AutoCompleteList>
+                </AutoComplete>
+                <FormHelperText fontSize="xs">
+                  Most teams use Closed, Completed, Deployed or Deployed to
+                  production
+                </FormHelperText>
+              </FormControl>
+              <FormControl>
+                <FormLabel>
+                  Select tasks completed between a date range
+                </FormLabel>
+                <HStack w="100%">
                   <FormControl>
                     <FormLabel>Start date</FormLabel>
                     <DatePicker
@@ -407,9 +433,115 @@ export default function ClickupPage() {
                     />
                   </FormControl>
                 </HStack>
-                {isLoadingTasks && !!statuses.length && (
-                  <Text>Fetching tasks...</Text>
-                )}
+
+                <FormHelperText fontSize="xs">
+                  Use this option if your team has a done status setup on
+                  Clickup
+                </FormHelperText>
+              </FormControl>
+              <Stack w="100%" direction={{ base: "column", md: "row" }}>
+                <Button
+                  size="sm"
+                  type="button"
+                  onClick={handlePrevious}
+                  order={{ base: 2, md: 1 }}
+                  w={{ base: "100%", md: "50%" }}
+                >
+                  Back
+                </Button>
+                <Button
+                  size="sm"
+                  type="submit"
+                  colorScheme="blue"
+                  onClick={handleNext}
+                  order={{ base: 1, md: 2 }}
+                  isLoading={isLoadingTasks}
+                  isDisabled={isLoadingTasks}
+                  loadingText="Fetching tasks..."
+                  w={{ base: "100%", md: "50%" }}
+                >
+                  Next
+                </Button>
+              </Stack>
+            </Stack>
+          </Stack>
+        )}
+        {section === 3 && (
+          <Stack spacing="6">
+            <Heading size="sm">
+              Generate content from <Code rounded="md">{list?.name}</Code> list
+            </Heading>
+
+            <Collapse in={!!selectedTasks.length}>
+              <Stack w="100%" direction={{ base: "column", md: "row" }}>
+                <Button
+                  size="sm"
+                  type="button"
+                  onClick={() => {
+                    if (!!summary) {
+                      setSummary("");
+                    } else {
+                      handlePrevious();
+                    }
+                  }}
+                  order={{ base: 2, md: 1 }}
+                  w={{ base: "100%", md: "50%" }}
+                >
+                  Back
+                </Button>
+                <Button
+                  size="sm"
+                  type="submit"
+                  colorScheme="blue"
+                  order={{ base: 1, md: 2 }}
+                  w={{ base: "100%", md: "50%" }}
+                  onClick={handleGenerateContent}
+                  isLoading={isGeneratingContent}
+                  isDisabled={!selectedTasks?.length}
+                >
+                  Generate content
+                </Button>
+              </Stack>
+            </Collapse>
+            {summary ? (
+              <Stack spacing="6" bg="white" p="4" rounded="md">
+                <Text fontSize="lg" fontWeight="medium" color="fg.emphasized">
+                  Generated content
+                </Text>
+                <ReactMarkdown
+                  components={{
+                    a: (props) => (
+                      <Link
+                        color="#3525e6"
+                        target="_blank"
+                        href={props.href}
+                        rel="noopener noreferrer"
+                        style={{
+                          ...props.style,
+                          color: "#3525e6",
+                          fontWeight: 400,
+                          wordBreak: "break-word",
+                          textDecorationLine: "underline",
+                        }}
+                      >
+                        {props.children}
+                      </Link>
+                    ),
+                    p: ({ children, ...rest }) => (
+                      <Text py="2" wordBreak="break-word" color="gray.900">
+                        {children}
+                      </Text>
+                    ),
+                    h2: (props) => (
+                      <Heading lineHeight="unset" fontSize="lg" {...props} />
+                    ),
+                  }}
+                >
+                  {summary}
+                </ReactMarkdown>
+              </Stack>
+            ) : (
+              <>
                 {tasks && !!tasks.length && (
                   <Stack spacing="6">
                     <Text
@@ -447,81 +579,23 @@ export default function ClickupPage() {
                               {t.description ?? t.text_content}
                             </Text>
                           )}
-                          {/* {statuses.length > 1 && ( */}
-                          <Badge
-                            mt="2"
-                            size="sm"
-                            w="fit-content"
-                            display="block"
-                            bg={t.status.color}
-                          >
-                            {t.status.status}
-                          </Badge>
-                          {/* )} */}
+                          {statuses.length > 1 && (
+                            <Badge
+                              mt="2"
+                              size="sm"
+                              w="fit-content"
+                              display="block"
+                              bg={t.status.color}
+                            >
+                              {t.status.status}
+                            </Badge>
+                          )}
                         </CheckboxCard>
                       ))}
                     </CheckboxCardGroup>
                   </Stack>
                 )}
-                <Stack w="100%" direction={{ base: "column", md: "row" }}>
-                  <Button
-                    size="sm"
-                    type="button"
-                    onClick={handlePrevious}
-                    order={{ base: 2, md: 1 }}
-                    w={{ base: "100%", md: "50%" }}
-                  >
-                    Back
-                  </Button>
-                  <Button
-                    size="sm"
-                    type="submit"
-                    colorScheme="blue"
-                    order={{ base: 1, md: 2 }}
-                    w={{ base: "100%", md: "50%" }}
-                    onClick={handleGenerateContent}
-                    isLoading={isGeneratingContent}
-                    isDisabled={!selectedTasks?.length}
-                  >
-                    Generate content
-                  </Button>
-                </Stack>
-              </Stack>
-            </Box>
-            {summary && (
-              <Stack bg="white" p="4" rounded="sm">
-                <Text fontSize="lg" fontWeight="medium" color="fg.emphasized">
-                  Generated content
-                </Text>
-                <ReactMarkdown
-                  components={{
-                    a: (props) => (
-                      <Link
-                        color="#3525e6"
-                        target="_blank"
-                        href={props.href}
-                        rel="noopener noreferrer"
-                        style={{
-                          ...props.style,
-                          color: "#3525e6",
-                          fontWeight: 400,
-                          wordBreak: "break-word",
-                          textDecorationLine: "underline",
-                        }}
-                      >
-                        {props.children}
-                      </Link>
-                    ),
-                    p: ({ children, ...rest }) => (
-                      <Text py="2" wordBreak="break-word" color="gray.900">
-                        {children}
-                      </Text>
-                    ),
-                  }}
-                >
-                  {summary}
-                </ReactMarkdown>
-              </Stack>
+              </>
             )}
           </Stack>
         )}
