@@ -554,7 +554,7 @@ export default function ClickupPage() {
                     <CheckboxCardGroup
                       spacing="3"
                       value={selectedTasks}
-                      onChange={(v) => setSelectedTasks(v)}
+                      onChange={(v) => setSelectedTasks(v as string[])}
                     >
                       {tasks.map((t) => (
                         <CheckboxCard key={t.id} value={t.id}>
