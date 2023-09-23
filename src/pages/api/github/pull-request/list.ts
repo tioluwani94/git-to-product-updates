@@ -8,7 +8,8 @@ export default async function handler(
   res: NextApiResponse
 ) {
   try {
-    const { profile, accessToken } =
+    const { accessToken } =
+      //@ts-ignore
       (await getServerSession(req, res, authOptions)) ?? {};
 
     const { repo_name, state, owner } = req.query;

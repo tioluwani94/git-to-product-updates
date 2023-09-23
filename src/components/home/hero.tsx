@@ -9,10 +9,11 @@ import {
   Text,
   VisuallyHidden,
 } from "@chakra-ui/react";
-import { signIn } from "next-auth/react";
-import { FaGithub, FaPlay } from "react-icons/fa";
+import { useRouter } from "next/router";
+import { FaPlay } from "react-icons/fa";
 
 export const Hero = () => {
+  const { push } = useRouter();
   return (
     <Box as="section" bg="gray.800" color="white" py="4rem">
       <Box
@@ -30,11 +31,13 @@ export const Hero = () => {
             letterSpacing="tight"
             fontWeight="extrabold"
           >
-            AI-generated release notes from your Git commits, PRs and Changelogs
+            AI-generated product announcements from your Git commits, PRs and
+            Changelogs
           </Heading>
           <Text fontSize="xl" mt="4" maxW="xl" mx="auto">
             Simplify your release process and generate polished, detailed
-            release notes with the help of our AI-powered changelog assistant
+            product announcements with the help of our AI-powered changelog
+            assistant
           </Text>
         </Box>
 
@@ -52,10 +55,9 @@ export const Hero = () => {
               fontSize="md"
               fontWeight="bold"
               colorScheme="blue"
-              leftIcon={<FaGithub />}
-              onClick={() => signIn()}
+              onClick={() => push("/login")}
             >
-              Get started with Github
+              Get started
             </Button>
           </LightMode>
         </Stack>

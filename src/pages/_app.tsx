@@ -12,6 +12,7 @@ import {
   QueryClientProvider,
 } from "@tanstack/react-query";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
+import { ProtectedRoute } from "@/components/protected";
 
 export default function App({
   Component,
@@ -29,21 +30,32 @@ export default function App({
   );
 
   return (
-    <SessionProvider session={session}>
-      <QueryClientProvider client={queryClient}>
-        <ReactQueryDevtools position="bottom-left" initialIsOpen={false} />
-        <Hydrate
-          //@ts-ignore
-          state={pageProps.dehydratedState}
-        >
+    <QueryClientProvider client={queryClient}>
+      <ReactQueryDevtools position="bottom-left" initialIsOpen={false} />
+      <Hydrate
+        //@ts-ignore
+        state={pageProps.dehydratedState}
+      >
+        <SessionProvider session={session}>
           <ChakraProvider theme={theme}>
-            <AppLayout>
-              <Component {...pageProps} />
-            </AppLayout>
-            <Analytics mode="production" />
+            {
+              //@ts-ignore
+              Component.auth ? (
+                <ProtectedRoute>
+                  <AppLayout>
+                    <Component {...pageProps} />
+                  </AppLayout>
+                </ProtectedRoute>
+              ) : (
+                <AppLayout>
+                  <Component {...pageProps} />
+                </AppLayout>
+              )
+            }
           </ChakraProvider>
-        </Hydrate>
-      </QueryClientProvider>
-    </SessionProvider>
+        </SessionProvider>
+        <Analytics mode="production" />
+      </Hydrate>
+    </QueryClientProvider>
   );
 }

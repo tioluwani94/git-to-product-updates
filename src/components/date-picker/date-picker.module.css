@@ -1,0 +1,17 @@
+.DayPicker-Day {
+  display: table-cell;
+  padding: 0.5em;
+  border-radius: 5px;
+  vertical-align: middle;
+  text-align: center;
+  cursor: pointer;
+  font-size: 0.75rem;
+}
+
+.DayPicker-Caption {
+  font-size: 0.7rem;
+}
+
+.DayPickerInput-Overlay {
+  z-index: 10;
+}

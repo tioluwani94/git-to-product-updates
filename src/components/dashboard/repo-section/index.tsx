@@ -95,8 +95,6 @@ export const RepoSection = () => {
         }))
       : undefined;
 
-    console.log({ commit_messages, pull_requests });
-
     const response = await fetch("/api/summarize", {
       method: "POST",
       headers: {

@@ -15,9 +15,9 @@ import {
 } from "@chakra-ui/react";
 import { signIn, signOut, useSession } from "next-auth/react";
 import { useRouter } from "next/router";
-import { FaGithub } from "react-icons/fa";
 import { MdLogout } from "react-icons/md";
 import { Logo } from "./logo";
+import Link from "next/link";
 
 export const Navbar = () => {
   const { data: session } = useSession();
@@ -28,11 +28,14 @@ export const Navbar = () => {
 
   const bgStyle: { [key: string]: string } = {
     "/": "gray.800",
+    "/login": "gray.800",
     "/dashboard": "bg-surface",
+    "/dashboard/clickup": "bg-surface",
   };
 
   const logoColor: { [key: string]: string } = {
     "/": "white",
+    "/login": "white",
     "/dashboard": "gray.900",
   };
 
@@ -40,18 +43,13 @@ export const Navbar = () => {
     <Box as="nav" bg={bgStyle[asPath]} boxShadow="sm">
       <Container py={{ base: "3", lg: "4" }}>
         <Flex justify="space-between">
-          <HStack spacing="4">
+          <Link passHref href="/">
             <Logo color={logoColor[asPath]} />
-          </HStack>
+          </Link>
           {!session ? (
             <HStack spacing="4">
-              <Button
-                size="sm"
-                colorScheme="blue"
-                leftIcon={<FaGithub />}
-                onClick={() => signIn()}
-              >
-                Sign in with Github
+              <Button size="sm" colorScheme="blue" onClick={() => signIn()}>
+                Login
               </Button>
             </HStack>
           ) : (

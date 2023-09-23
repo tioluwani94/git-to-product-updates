@@ -12,19 +12,18 @@ export default async function handler(
       //@ts-ignore
       (await getServerSession(req, res, authOptions)) ?? {};
 
-    const { repo_name, owner, per_page, page } = req.query;
+    const { space_id } = req.query;
 
     const { data } = await axios.get(
-      `${process.env.GITHUB_BASE_URL}/repos/${owner}/${repo_name}/releases/latest`,
+      `${process.env.CLICKUP_BASE_URL}/space/${space_id}/folder`,
       {
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${accessToken}`,
+          Authorization: `${accessToken}`,
         },
-        params: { per_page, page },
       }
     );
-    res.status(200).json(data);
+    res.status(200).json(data.folders);
   } catch (error) {
     res.status(500).json({ error: "An error occured" });
   }
