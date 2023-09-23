@@ -317,7 +317,9 @@ export default function ClickupPage() {
             </Heading>
             <Stack spacing="8">
               <FormControl>
-                <FormLabel>Give a short description of your product</FormLabel>
+                <FormLabel>
+                  Give a short description on what your product is
+                </FormLabel>
                 <Input
                   size="sm"
                   type="text"
