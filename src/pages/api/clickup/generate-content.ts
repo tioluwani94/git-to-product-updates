@@ -21,12 +21,13 @@ export default async function handler(req: Request, res: Response) {
         {
           role: "system",
           content: `
-          Using the provided JSON data containing tasks representing ${
+          You are an expert product manager.
+          Using an array of tasks provided in JSON format representing ${
             contentTypeRegister[content_type]
           } for a/an ${product_description} product, generate a detailed product update document for each task. Each update should:
     
           1. Start with the task title as a heading.
-          2. Follow with a detailed explanation based on the task description, incorporating the feature's importance, how users can access it, and the benefits or improvements it brings to the system.
+          2. Follow with a detailed explanation based on the task title and description, incorporating the feature's importance, how users can access it, and the benefits or improvements it brings to the system.
           3. Ensure that the language used is formal and suitable for a B2B audience.
           4. Provide any relevant instructions or steps to utilize the new feature if necessary.
           

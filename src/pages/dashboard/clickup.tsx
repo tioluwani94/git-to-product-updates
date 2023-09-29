@@ -8,6 +8,7 @@ import {
   RadioCard,
   RadioCardGroup,
 } from "@/components/layout/radio-card-group";
+import { Notification } from "@/components/notification";
 import {
   getFolderlessLists,
   getFolders,
@@ -36,16 +37,21 @@ import {
   Code,
   Collapse,
   Container,
+  Flex,
   FormControl,
   FormHelperText,
   FormLabel,
   HStack,
   Heading,
+  IconButton,
   Input,
   Link,
   Skeleton,
   Stack,
   Text,
+  Tooltip,
+  useClipboard,
+  useToast,
 } from "@chakra-ui/react";
 import {
   AutoComplete,
@@ -56,14 +62,16 @@ import {
 } from "@choc-ui/chakra-autocomplete";
 import { useQuery } from "@tanstack/react-query";
 import getUnixTime from "date-fns/getUnixTime";
+import { Editor } from "novel";
 import { useEffect, useRef, useState } from "react";
+import { FiCheckCircle, FiCopy, FiEdit2 } from "react-icons/fi";
 import ReactMarkdown from "react-markdown";
 
 export default function ClickupPage() {
   const [section, setSection] = useState(0);
   const [summary, setSummary] = useState("");
   const [statuses, setStatuses] = useState<string[]>([]);
-  const [content_type, setContentType] = useState("bugs");
+  const [content_type, setContentType] = useState("features");
   const [selectedTasks, setSelectedTasks] = useState<string[]>([]);
   const [product_description, setProductDescription] = useState("");
   const [isGeneratingContent, setIsGeneratingConent] = useState(false);
@@ -77,6 +85,9 @@ export default function ClickupPage() {
   );
 
   const productDescriptionInputRef = useRef<HTMLInputElement>(null);
+
+  const toast = useToast();
+  const { onCopy, hasCopied } = useClipboard(summary);
 
   const { data: teams, isLoading: isLoadingTeams } = useQuery<ClickUpTeam[]>(
     ["clickup-teams"],
@@ -109,7 +120,11 @@ export default function ClickupPage() {
     { enabled: !!selectedList }
   );
 
-  const { data: tasks, isLoading: isLoadingTasks } = useQuery<ClickupTask[]>(
+  const {
+    data: tasks,
+    isLoading: isLoadingTasks,
+    isFetching: isFetchingTasks,
+  } = useQuery<ClickupTask[]>(
     ["clickup-list-task", selectedList, statuses, start_date, end_date],
     () =>
       getTasks(selectedList ?? "", {
@@ -121,9 +136,10 @@ export default function ClickupPage() {
           : undefined,
       }),
     {
-      enabled: !!selectedList && !!statuses.length,
+      enabled: !!(selectedList && statuses.length),
     }
   );
+
   const handleGenerateContent = async () => {
     setSummary("");
     setIsGeneratingConent(true);
@@ -146,7 +162,14 @@ export default function ClickupPage() {
     });
 
     if (!response.ok) {
-      console.log("error", response.statusText);
+      setIsGeneratingConent(false);
+      console.log(response);
+      toast({
+        position: "bottom-left",
+        render: ({ onClose }) => (
+          <Notification message={response.statusText} onClose={onClose} />
+        ),
+      });
       return;
     }
 
@@ -174,6 +197,10 @@ export default function ClickupPage() {
 
   const handlePrevious = () => {
     setSection(section - 1);
+  };
+
+  const handleEdit = () => {
+    setSection(4);
   };
 
   useEffect(() => {
@@ -288,7 +315,11 @@ export default function ClickupPage() {
                 </RadioCardGroup>
               </Stack>
             )}
-            <HStack w="100%">
+            <Stack
+              w="100%"
+              spacing={{ base: 4, md: 6 }}
+              direction={{ base: "column", md: "row" }}
+            >
               <Button
                 size="sm"
                 onClick={handlePrevious}
@@ -307,7 +338,7 @@ export default function ClickupPage() {
               >
                 Next
               </Button>
-            </HStack>
+            </Stack>
           </Stack>
         )}
         {section === 2 && (
@@ -354,7 +385,7 @@ export default function ClickupPage() {
               </FormControl>
               <FormControl>
                 <FormLabel color="gray.600">
-                  What status do you use to represent completed tasks?
+                  What status do you use to represent done tasks?
                 </FormLabel>
                 <AutoComplete
                   multiple
@@ -455,10 +486,10 @@ export default function ClickupPage() {
                   colorScheme="blue"
                   onClick={handleNext}
                   order={{ base: 1, md: 2 }}
-                  isLoading={isLoadingTasks}
                   isDisabled={isLoadingTasks}
                   loadingText="Fetching tasks..."
                   w={{ base: "100%", md: "50%" }}
+                  isLoading={isLoadingTasks && isFetchingTasks}
                 >
                   Next
                 </Button>
@@ -473,7 +504,11 @@ export default function ClickupPage() {
             </Heading>
 
             <Collapse in={!!selectedTasks.length}>
-              <Stack w="100%" direction={{ base: "column", md: "row" }}>
+              <Stack
+                w="100%"
+                spacing={4}
+                direction={{ base: "column", md: "row" }}
+              >
                 <Button
                   size="sm"
                   type="button"
@@ -505,9 +540,33 @@ export default function ClickupPage() {
             </Collapse>
             {summary ? (
               <Stack spacing="6" bg="white" p="4" rounded="md">
-                <Text fontSize="lg" fontWeight="medium" color="fg.emphasized">
-                  Generated content
-                </Text>
+                <Flex alignItems="center" justifyContent="space-between">
+                  <Text fontSize="lg" fontWeight="medium" color="fg.emphasized">
+                    Generated content
+                  </Text>
+                  <Stack direction="row">
+                    <Tooltip label="Copy content" aria-label="Copy content">
+                      <IconButton
+                        isRound
+                        size="xs"
+                        onClick={onCopy}
+                        variant="outline"
+                        aria-label="Copy content"
+                        icon={hasCopied ? <FiCheckCircle /> : <FiCopy />}
+                      />
+                    </Tooltip>
+                    <Tooltip label="Edit content" aria-label="Edit content">
+                      <IconButton
+                        isRound
+                        size="xs"
+                        variant="outline"
+                        icon={<FiEdit2 />}
+                        onClick={handleEdit}
+                        aria-label="Edit content"
+                      />
+                    </Tooltip>
+                  </Stack>
+                </Flex>
                 <ReactMarkdown
                   components={{
                     a: (props) => (
@@ -597,6 +656,40 @@ export default function ClickupPage() {
                 )}
               </>
             )}
+          </Stack>
+        )}
+        {section === 4 && (
+          <Stack spacing="6">
+            <Editor
+              defaultValue={summary}
+              disableLocalStorage={true}
+              className="relative min-h-[500px] w-full max-w-screen-lg border-stone-200 bg-white sm:mb-0 sm:rounded-lg sm:border sm:shadow-md"
+            />
+            <Stack
+              w="100%"
+              spacing={4}
+              direction={{ base: "column", md: "row" }}
+            >
+              <Button
+                size="sm"
+                type="button"
+                onClick={handlePrevious}
+                order={{ base: 2, md: 1 }}
+                w={{ base: "100%", md: "50%" }}
+              >
+                Back
+              </Button>
+              <Button
+                size="sm"
+                type="submit"
+                colorScheme="blue"
+                order={{ base: 1, md: 2 }}
+                w={{ base: "100%", md: "50%" }}
+                onClick={() => {}}
+              >
+                Share
+              </Button>
+            </Stack>
           </Stack>
         )}
       </Container>
