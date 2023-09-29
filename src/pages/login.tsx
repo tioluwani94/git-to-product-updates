@@ -1,6 +1,6 @@
 import { Box, Button, Container, Heading, Stack } from "@chakra-ui/react";
 import { signIn } from "next-auth/react";
-import { FaGithub } from "react-icons/fa";
+// import { FaGithub } from "react-icons/fa";
 import { SiClickup } from "react-icons/si";
 
 const LoginPage = () => {
@@ -17,7 +17,7 @@ const LoginPage = () => {
         <Stack spacing="8">
           <Stack spacing="6" align="center">
             <Heading size={{ base: "xs", md: "sm" }}>
-              Log into VersionVault
+              Log into AnnounceFlow
             </Heading>
           </Stack>
           <Stack spacing="4">
@@ -39,7 +39,7 @@ const LoginPage = () => {
             >
               Continue with Clickup
             </Button>
-            <Button
+            {/* <Button
               variant="secondary"
               leftIcon={<FaGithub />}
               onClick={() =>
@@ -49,7 +49,7 @@ const LoginPage = () => {
               }
             >
               Continue with Github
-            </Button>
+            </Button> */}
           </Stack>
         </Stack>
       </Container>
