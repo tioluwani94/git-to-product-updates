@@ -1,16 +1,6 @@
-import {
-  Box,
-  Button,
-  Circle,
-  Heading,
-  Img,
-  LightMode,
-  Stack,
-  Text,
-  VisuallyHidden,
-} from "@chakra-ui/react";
+import { Box, Button, Heading, LightMode, Stack, Text } from "@chakra-ui/react";
 import { useRouter } from "next/router";
-import { FaPlay } from "react-icons/fa";
+import ReactCompareImage from "react-compare-image";
 
 export const Hero = () => {
   const { push } = useRouter();
@@ -25,28 +15,25 @@ export const Hero = () => {
           <Heading
             as="h1"
             mx="auto"
-            size="3xl"
+            size="xl"
             maxW="54rem"
             lineHeight="1.2"
             letterSpacing="tight"
-            fontWeight="extrabold"
+            fontWeight="bold"
           >
-            AI-generated product announcements from your Git commits, PRs and
-            Changelogs
+            AI-generated product announcements from your Clickup tasks
           </Heading>
           <Text fontSize="xl" mt="4" maxW="xl" mx="auto">
-            Simplify your release process and generate polished, detailed
-            product announcements with the help of our AI-powered changelog
-            assistant
+            Simplify your release process and generate polished and detailed
+            product announcements with the help of AI.
           </Text>
         </Box>
 
         <Stack
+          my="8"
+          spacing="4"
           justify="center"
           direction={{ base: "column", md: "row" }}
-          mt="10"
-          mb="20"
-          spacing="4"
         >
           <LightMode>
             <Button
@@ -63,35 +50,17 @@ export const Hero = () => {
         </Stack>
 
         <Box
-          className="group"
-          cursor="pointer"
-          position="relative"
+          h="500px"
           rounded="lg"
+          cursor="pointer"
           overflow="hidden"
+          className="group"
+          position="relative"
         >
-          <Img
-            alt="Screenshot of Envelope App"
-            src="https://res.cloudinary.com/chakra-ui-pro/image/upload/v1621085270/pro-website/app-screenshot-light_kit2sp.png"
+          <ReactCompareImage
+            leftImage="/images/clickup-board.png"
+            rightImage="/images/announcement.png"
           />
-          <Circle
-            size="20"
-            as="button"
-            bg="white"
-            shadow="lg"
-            color="purple.600"
-            position="absolute"
-            top="50%"
-            left="50%"
-            transform="translate3d(-50%, -50%, 0)"
-            fontSize="xl"
-            transition="all 0.2s"
-            _groupHover={{
-              transform: "translate3d(-50%, -50%, 0) scale(1.05)",
-            }}
-          >
-            <VisuallyHidden>Play demo video</VisuallyHidden>
-            <FaPlay />
-          </Circle>
         </Box>
       </Box>
     </Box>

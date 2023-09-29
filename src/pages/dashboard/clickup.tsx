@@ -211,7 +211,7 @@ export default function ClickupPage() {
 
   return (
     <Box as="main">
-      <Container maxW="xl" py="8">
+      <Container maxW={section === 4 ? "4xl" : "2xl"} py="8">
         {section === 0 && (
           <Stack spacing="4">
             <Heading size="sm">Select a space</Heading>
@@ -315,11 +315,7 @@ export default function ClickupPage() {
                 </RadioCardGroup>
               </Stack>
             )}
-            <Stack
-              w="100%"
-              spacing={{ base: 4, md: 6 }}
-              direction={{ base: "column", md: "row" }}
-            >
+            <Stack w="100%" direction={{ base: "column", md: "row" }}>
               <Button
                 size="sm"
                 onClick={handlePrevious}
@@ -344,7 +340,8 @@ export default function ClickupPage() {
         {section === 2 && (
           <Stack spacing="4">
             <Heading size="sm">
-              Generate content from <Code rounded="md">{list?.name}</Code> list
+              Generate announcement from <Code rounded="md">{list?.name}</Code>{" "}
+              list
             </Heading>
             <Stack spacing="8">
               <FormControl>

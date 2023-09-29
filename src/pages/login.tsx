@@ -17,7 +17,7 @@ const LoginPage = () => {
         <Stack spacing="8">
           <Stack spacing="6" align="center">
             <Heading size={{ base: "xs", md: "sm" }}>
-              Log into VersionVault
+              Log into AnnounceFlow
             </Heading>
           </Stack>
           <Stack spacing="4">
