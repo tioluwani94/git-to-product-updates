@@ -43,8 +43,8 @@ export const Notification: React.FC<Props> = (props) => {
     >
       <Flex direction="row-reverse">
         <Box
+          bg="white"
           boxShadow="md"
-          bg="bg.surface"
           borderRadius="lg"
           position="relative"
           width={{ base: "full", sm: "md" }}
@@ -66,7 +66,7 @@ export const Notification: React.FC<Props> = (props) => {
               </Stack>
             </Stack>
             <CloseButton
-              size="xs"
+              size="sm"
               top="8px"
               right="8px"
               onClick={onClose}

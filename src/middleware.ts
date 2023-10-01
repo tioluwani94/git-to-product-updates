@@ -21,5 +21,12 @@ export default async function middleware(request: NextRequest) {
   );
   return success
     ? NextResponse.next()
-    : NextResponse.redirect(new URL("/blocked", request.url));
+    : new Response("You have reached your request limit for the day.", {
+        status: 429,
+        headers: {
+          "X-RateLimit-Limit": limit.toString(),
+          "X-RateLimit-Remaining": remaining.toString(),
+          "X-RateLimit-Reset": reset.toString(),
+        },
+      });
 }

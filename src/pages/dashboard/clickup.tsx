@@ -167,7 +167,11 @@ export default function ClickupPage() {
       toast({
         position: "bottom-left",
         render: ({ onClose }) => (
-          <Notification message={response.statusText} onClose={onClose} />
+          <Notification
+            status="error"
+            onClose={onClose}
+            message={response.statusText}
+          />
         ),
       });
       return;
