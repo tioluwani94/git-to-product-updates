@@ -485,10 +485,10 @@ export default function ClickupPage() {
                   colorScheme="blue"
                   onClick={handleNext}
                   order={{ base: 1, md: 2 }}
-                  isDisabled={isLoadingTasks}
                   loadingText="Fetching tasks..."
                   w={{ base: "100%", md: "50%" }}
                   isLoading={isLoadingTasks && isFetchingTasks}
+                  isDisabled={isLoadingTasks || !product_description}
                 >
                   Next
                 </Button>
@@ -641,6 +641,7 @@ export default function ClickupPage() {
                             <Badge
                               mt="2"
                               size="sm"
+                              color="white"
                               w="fit-content"
                               display="block"
                               bg={t.status.color}
