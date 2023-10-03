@@ -28,7 +28,6 @@ import {
   Box,
   Button,
   Code,
-  Collapse,
   Container,
   Flex,
   FormControl,
@@ -41,10 +40,10 @@ import {
   Link,
   Skeleton,
   Stack,
+  Switch,
   Text,
   Tooltip,
   useClipboard,
-  useDisclosure,
   useToast,
 } from "@chakra-ui/react";
 import {
@@ -56,19 +55,13 @@ import {
 } from "@choc-ui/chakra-autocomplete";
 import { Editor } from "novel";
 import { useEffect, useRef, useState } from "react";
-import {
-  FiCheckCircle,
-  FiChevronLeft,
-  FiCopy,
-  FiEdit2,
-  FiSkipBack,
-  FiX,
-} from "react-icons/fi";
+import { FiCheckCircle, FiChevronLeft, FiCopy } from "react-icons/fi";
 import ReactMarkdown from "react-markdown";
 
 export default function ClickupPage() {
   const [section, setSection] = useState(0);
   const [summary, setSummary] = useState("");
+  const [isEditing, setIsEditing] = useState(false);
   const [statuses, setStatuses] = useState<string[]>([]);
   const [content_type, setContentType] = useState("features");
   const [selectedTasks, setSelectedTasks] = useState<string[]>([]);
@@ -88,7 +81,6 @@ export default function ClickupPage() {
   const toast = useToast();
 
   const { onCopy, hasCopied } = useClipboard(summary);
-  const { isOpen: isEditing, onToggle: onToggleEditing } = useDisclosure();
 
   const { data: teams, isLoading: isLoadingTeams } = useGetClickupTeams();
 
@@ -119,7 +111,6 @@ export default function ClickupPage() {
   const handleGenerateContent = async () => {
     setSummary("");
     setIsGeneratingConent(true);
-
     const response = await fetch("/api/clickup/generate-content", {
       method: "POST",
       headers: {
@@ -136,10 +127,8 @@ export default function ClickupPage() {
           })),
       }),
     });
-
     if (!response.ok) {
       setIsGeneratingConent(false);
-      console.log(response);
       toast({
         position: "bottom-left",
         render: ({ onClose }) => (
@@ -152,16 +141,13 @@ export default function ClickupPage() {
       });
       return;
     }
-
     const data = response.body;
     if (!data) {
       return;
     }
-
     const reader = data.getReader();
     const decoder = new TextDecoder();
     let done = false;
-
     while (!done) {
       const { value, done: doneReading } = await reader.read();
       done = doneReading;
@@ -177,10 +163,6 @@ export default function ClickupPage() {
 
   const handlePrevious = () => {
     setSection(section - 1);
-  };
-
-  const handleEdit = () => {
-    setSection(4);
   };
 
   useEffect(() => {
@@ -514,7 +496,12 @@ export default function ClickupPage() {
                       />
                     </Tooltip>
                     <Stack direction="row">
-                      <Tooltip label="Copy content" aria-label="Copy content">
+                      <Tooltip
+                        aria-label={
+                          hasCopied ? "Copied content" : "Copy content"
+                        }
+                        label={hasCopied ? "Copied content" : "Copy content"}
+                      >
                         <IconButton
                           isRound
                           size="xs"
@@ -524,14 +511,15 @@ export default function ClickupPage() {
                           icon={hasCopied ? <FiCheckCircle /> : <FiCopy />}
                         />
                       </Tooltip>
-                      <Tooltip label="Edit content" aria-label="Edit content">
-                        <IconButton
-                          isRound
-                          size="xs"
-                          variant="outline"
-                          aria-label="Edit content"
-                          onClick={onToggleEditing}
-                          icon={isEditing ? <FiX /> : <FiEdit2 />}
+                      <Tooltip
+                        shouldWrapChildren
+                        aria-label="Toggle edit mode"
+                        label={`Edit mode ${isEditing ? "on" : "off"}`}
+                      >
+                        <Switch
+                          size="sm"
+                          isChecked={isEditing}
+                          onChange={(e) => setIsEditing(e.target.checked)}
                         />
                       </Tooltip>
                     </Stack>
@@ -540,6 +528,9 @@ export default function ClickupPage() {
                     <Editor
                       defaultValue={summary}
                       disableLocalStorage={true}
+                      onUpdate={(editor) => {
+                        setSummary(editor?.storage.markdown.getMarkdown());
+                      }}
                       className="relative min-h-[500px] py-0 w-full max-w-screen-lg bg-white"
                     />
                   ) : (
@@ -588,41 +579,39 @@ export default function ClickupPage() {
                         Generate content from{" "}
                         <Code rounded="md">{list?.name}</Code> list
                       </Heading>
-                      <Collapse in={!!selectedTasks.length}>
-                        <Stack
-                          w="100%"
-                          spacing={4}
-                          direction={{ base: "column", md: "row" }}
+                      <Stack
+                        w="100%"
+                        spacing={4}
+                        direction={{ base: "column", md: "row" }}
+                      >
+                        <Button
+                          size="sm"
+                          type="button"
+                          onClick={() => {
+                            if (!!summary) {
+                              setSummary("");
+                            } else {
+                              handlePrevious();
+                            }
+                          }}
+                          order={{ base: 2, md: 1 }}
+                          w={{ base: "100%", md: "50%" }}
                         >
-                          <Button
-                            size="sm"
-                            type="button"
-                            onClick={() => {
-                              if (!!summary) {
-                                setSummary("");
-                              } else {
-                                handlePrevious();
-                              }
-                            }}
-                            order={{ base: 2, md: 1 }}
-                            w={{ base: "100%", md: "50%" }}
-                          >
-                            Back
-                          </Button>
-                          <Button
-                            size="sm"
-                            type="submit"
-                            colorScheme="blue"
-                            order={{ base: 1, md: 2 }}
-                            w={{ base: "100%", md: "50%" }}
-                            onClick={handleGenerateContent}
-                            isLoading={isGeneratingContent}
-                            isDisabled={!selectedTasks?.length}
-                          >
-                            Generate content
-                          </Button>
-                        </Stack>
-                      </Collapse>
+                          Back
+                        </Button>
+                        <Button
+                          size="sm"
+                          type="submit"
+                          colorScheme="blue"
+                          order={{ base: 1, md: 2 }}
+                          w={{ base: "100%", md: "50%" }}
+                          onClick={handleGenerateContent}
+                          isLoading={isGeneratingContent}
+                          isDisabled={!selectedTasks?.length}
+                        >
+                          Generate content
+                        </Button>
+                      </Stack>
                       <Text
                         fontSize="lg"
                         fontWeight="medium"

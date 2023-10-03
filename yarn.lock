@@ -5210,10 +5210,10 @@ normalize-url@^4.1.0:
   resolved "https://registry.yarnpkg.com/normalize-url/-/normalize-url-4.5.1.tgz#0dd90cf1288ee1d1313b87081c9a5932ee48518a"
   integrity sha512-9UZCFRHQdNrfTpGg8+1INIg93B6zE0aXMVFkw1WFwvO4SlZywU6aLg5Of0Ap/PgcbSw4LNxvMWXMeugwMCX0AA==
 
-novel@^0.1.21:
-  version "0.1.21"
-  resolved "https://registry.yarnpkg.com/novel/-/novel-0.1.21.tgz#a6d263495573ed8805e22be9b948b72a06967186"
-  integrity sha512-NFUTh9JId11kEjMvEwPj3XyLFA80IP6uwcyXioctA7QHxJsRZsgOhQ0NQs3D7w1CffdnP7ACYmdAvW8/+odNKA==
+novel@^0.1.22:
+  version "0.1.22"
+  resolved "https://registry.yarnpkg.com/novel/-/novel-0.1.22.tgz#a08d2d57639f5df26673e2687642203dcfa638e2"
+  integrity sha512-hdZ3iV4kvCISNjRNXqQk6fRVkMZmvzWjA3zXM1bU2SXVEufBxZL+77qsdEK/XETkJkeEdQl0mk8ERwLiL0BvRg==
   dependencies:
     "@radix-ui/react-popover" "^1.0.6"
     "@tiptap/core" "^2.1.7"
