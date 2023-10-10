@@ -604,13 +604,11 @@ export default function ClickupPage() {
             ref={contentPanelRef}
           >
             <Box h="640px" overflowY="auto" color="gray.900">
-              <Container>
-                <ContentSection
-                  content={summary}
-                  onChangeContent={setSummary}
-                  onToggleConfigPanel={handleToggleConfigPanel}
-                />
-              </Container>
+              <ContentSection
+                content={summary}
+                onChangeContent={setSummary}
+                onToggleConfigPanel={handleToggleConfigPanel}
+              />
             </Box>
           </Panel>
         </PanelGroup>
