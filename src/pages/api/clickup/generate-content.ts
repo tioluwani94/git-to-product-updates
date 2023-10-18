@@ -1,4 +1,4 @@
-import { contentTypeRegister } from "@/utils/data";
+import { contentTypeRegister, promptGenerator } from "@/utils/data";
 import { OpenAIStream, OpenAIStreamPayload } from "@/utils/openai-stream";
 
 export const config = {
@@ -6,7 +6,8 @@ export const config = {
 };
 
 export default async function handler(req: Request, res: Response) {
-  const { content_type, tasks, product_description } = await req.json();
+  const { content_type, tasks, product_description, tone, writing_length } =
+    await req.json();
 
   if (!tasks) {
     return new Response("Please select a tasks to generate content from.", {
@@ -20,34 +21,13 @@ export default async function handler(req: Request, res: Response) {
       messages: [
         {
           role: "system",
-          content: `
-          You are an expert product manager.
-          Using an array of tasks provided in JSON format representing ${
-            contentTypeRegister[content_type]
-          } for a/an ${product_description} product, generate a detailed product update document for each task. Each update should:
-    
-          1. Start with the task title as a heading.
-          2. Follow with a detailed explanation based on the task title and description, incorporating the feature's importance, how users can access it, and the benefits or improvements it brings to the system.
-          3. Ensure that the language used is formal and suitable for a B2B audience.
-          4. Provide any relevant instructions or steps to utilize the new feature if necessary.
-          
-          For example, if the task is:
-          {
-            "title": "Project templates",
-            "description": "You can now create standard templates for projects. You'll be able to define basic details such as the project name, description, lead, project members, project status, and associated roadmaps..."
-          }
-          
-          The output should be:
-          ## Project templates
-          You can now create standard templates for projects. You'll be able to define basic details such as the project name, description, lead, project members, project status, and associated roadmaps. To create or edit a project template, go to the Templates section in your team or workspace settings. When you initiate a new project, you'll have the option to apply one of these templates from the project creation modal, in the same way you do for issue templates.
-    
-          Here's the JSON data separated by asterisks:
-          ******************
-          ${JSON.stringify({
+          content: promptGenerator({
+            tone,
             tasks,
-          })}
-          ******************    
-        `,
+            content_type,
+            writing_length,
+            product_description,
+          }),
         },
       ],
       temperature: 0.2,

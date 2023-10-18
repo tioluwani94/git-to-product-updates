@@ -7,6 +7,10 @@ import {
   CheckboxCardGroup,
 } from "@/components/layout/checkbox-card-group";
 import {
+  RadioButton,
+  RadioButtonGroup,
+} from "@/components/layout/radio-button-group";
+import {
   RadioCard,
   RadioCardGroup,
 } from "@/components/layout/radio-card-group";
@@ -19,7 +23,7 @@ import {
   useGetSpaces,
   useGetTasks,
 } from "@/queries/clickup";
-import { contentTypeRegister } from "@/utils/data";
+import { TONES, WRITING_LENGTH, contentTypeRegister } from "@/utils/data";
 import {
   Accordion,
   AccordionButton,
@@ -40,6 +44,7 @@ import {
   Skeleton,
   Stack,
   Text,
+  VStack,
   useToast,
 } from "@chakra-ui/react";
 import {
@@ -49,6 +54,7 @@ import {
   AutoCompleteList,
   AutoCompleteTag,
 } from "@choc-ui/chakra-autocomplete";
+import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
 import {
   ImperativePanelHandle,
@@ -60,8 +66,10 @@ import {
 export default function ClickupPage() {
   const [section, setSection] = useState(0);
   const [summary, setSummary] = useState("");
+  const [tone, setTone] = useState("formal");
   const [statuses, setStatuses] = useState<string[]>([]);
   const [content_type, setContentType] = useState("features");
+  const [writing_length, setWritingLength] = useState("balanced");
   const [selectedTasks, setSelectedTasks] = useState<string[]>([]);
   const [product_description, setProductDescription] = useState("");
   const [isGeneratingContent, setIsGeneratingConent] = useState(false);
@@ -100,7 +108,12 @@ export default function ClickupPage() {
     isLoading: isLoadingTasks,
     isFetching: isFetchingTasks,
   } = useGetTasks(
-    { selectedList: selectedList ?? "", statuses, start_date, end_date },
+    {
+      end_date,
+      statuses,
+      start_date,
+      selectedList: selectedList ?? "",
+    },
     {
       enabled: !!(selectedList && statuses.length),
     }
@@ -468,6 +481,41 @@ export default function ClickupPage() {
                           on Clickup
                         </FormHelperText>
                       </FormControl>
+                      {content_type === "features" && (
+                        <>
+                          <FormControl>
+                            <FormLabel color="gray.600">Tone</FormLabel>
+                            <RadioButtonGroup
+                              size="sm"
+                              value={tone}
+                              onChange={(v) => setTone(v)}
+                            >
+                              {TONES.map((t) => (
+                                <RadioButton value={t.value} key={t.value}>
+                                  {t.label}
+                                </RadioButton>
+                              ))}
+                            </RadioButtonGroup>
+                          </FormControl>
+                          <FormControl>
+                            <FormLabel color="gray.600">
+                              Writing length
+                            </FormLabel>
+
+                            <RadioButtonGroup
+                              size="sm"
+                              value={writing_length}
+                              onChange={(v) => setWritingLength(v)}
+                            >
+                              {WRITING_LENGTH.map((t) => (
+                                <RadioButton value={t.value} key={t.value}>
+                                  {t.label}
+                                </RadioButton>
+                              ))}
+                            </RadioButtonGroup>
+                          </FormControl>
+                        </>
+                      )}
                       <Stack w="100%" direction={{ base: "column", md: "row" }}>
                         <Button
                           size="sm"
@@ -497,91 +545,154 @@ export default function ClickupPage() {
                 )}
                 {section === 3 && (
                   <>
-                    {tasks && !!tasks.length && (
-                      <Stack spacing="6">
-                        <Heading size="xs">
-                          Generate content from{" "}
-                          <Code rounded="md">{list?.name}</Code> list
-                        </Heading>
-                        <Stack
-                          w="100%"
-                          spacing={4}
-                          direction={{ base: "column", md: "row" }}
-                        >
+                    <Stack spacing="6">
+                      <Heading size="xs">
+                        Generate content from{" "}
+                        <Code rounded="md">{list?.name}</Code> list
+                      </Heading>
+
+                      {tasks?.length ? (
+                        <>
+                          <Stack
+                            w="100%"
+                            spacing={4}
+                            direction={{ base: "column", md: "row" }}
+                          >
+                            <Button
+                              size="sm"
+                              type="button"
+                              onClick={handlePrevious}
+                              order={{ base: 2, md: 1 }}
+                              w={{ base: "100%", md: "50%" }}
+                            >
+                              Back
+                            </Button>
+                            <Button
+                              size="sm"
+                              type="submit"
+                              colorScheme="blue"
+                              order={{ base: 1, md: 2 }}
+                              w={{ base: "100%", md: "50%" }}
+                              onClick={handleGenerateContent}
+                              isLoading={isGeneratingContent}
+                              isDisabled={!selectedTasks?.length}
+                            >
+                              Generate content
+                            </Button>
+                          </Stack>
+                          <Text
+                            fontSize="lg"
+                            fontWeight="medium"
+                            color="fg.emphasized"
+                          >
+                            Select the tasks you'll like to generate content
+                            from
+                          </Text>
+                          <CheckboxCardGroup
+                            spacing="3"
+                            value={selectedTasks}
+                            onChange={(v) => setSelectedTasks(v as string[])}
+                          >
+                            {tasks?.map((t) => (
+                              <CheckboxCard key={t.id} value={t.id}>
+                                <Text
+                                  mb="2"
+                                  fontSize="sm"
+                                  fontWeight="medium"
+                                  color="fg.emphasized"
+                                >
+                                  {t.name}
+                                </Text>
+                                {(t.description || t.text_content) && (
+                                  <Text
+                                    mt="2"
+                                    width="250px"
+                                    textStyle="sm"
+                                    color="fg.muted"
+                                    overflow="hidden"
+                                    whiteSpace="nowrap"
+                                    textOverflow="ellipsis"
+                                  >
+                                    {t.description ?? t.text_content}
+                                  </Text>
+                                )}
+                                {statuses.length > 1 && (
+                                  <Badge
+                                    mt="2"
+                                    size="sm"
+                                    color="white"
+                                    w="fit-content"
+                                    display="block"
+                                    bg={t.status.color}
+                                  >
+                                    {t.status.status}
+                                  </Badge>
+                                )}
+                              </CheckboxCard>
+                            ))}
+                          </CheckboxCardGroup>
+                          <Stack
+                            w="100%"
+                            spacing={4}
+                            direction={{ base: "column", md: "row" }}
+                          >
+                            <Button
+                              size="sm"
+                              type="button"
+                              onClick={handlePrevious}
+                              order={{ base: 2, md: 1 }}
+                              w={{ base: "100%", md: "50%" }}
+                            >
+                              Back
+                            </Button>
+                            <Button
+                              size="sm"
+                              type="submit"
+                              colorScheme="blue"
+                              order={{ base: 1, md: 2 }}
+                              w={{ base: "100%", md: "50%" }}
+                              onClick={handleGenerateContent}
+                              isLoading={isGeneratingContent}
+                              isDisabled={!selectedTasks?.length}
+                            >
+                              Generate content
+                            </Button>
+                          </Stack>
+                        </>
+                      ) : (
+                        <VStack pt={20} h="100%" justifyContent="center">
+                          <Image
+                            width={100}
+                            height={100}
+                            alt="task done"
+                            src="/images/no-task.png"
+                          />
+                          <Heading
+                            fontSize="lg"
+                            lineHeight="unset"
+                            textAlign="center"
+                          >
+                            No Tasks
+                          </Heading>
+                          <Text
+                            textAlign="center"
+                            color="gray.500"
+                            fontSize="sm"
+                          >
+                            No tasks for the selected configuration{" "}
+                            <span role="img">😔</span>
+                          </Text>
                           <Button
                             size="sm"
                             type="button"
                             onClick={handlePrevious}
                             order={{ base: 2, md: 1 }}
-                            w={{ base: "100%", md: "50%" }}
                           >
-                            Back
+                            Go back
                           </Button>
-                          <Button
-                            size="sm"
-                            type="submit"
-                            colorScheme="blue"
-                            order={{ base: 1, md: 2 }}
-                            w={{ base: "100%", md: "50%" }}
-                            onClick={handleGenerateContent}
-                            isLoading={isGeneratingContent}
-                            isDisabled={!selectedTasks?.length}
-                          >
-                            Generate content
-                          </Button>
-                        </Stack>
-                        <Text
-                          fontSize="lg"
-                          fontWeight="medium"
-                          color="fg.emphasized"
-                        >
-                          Select the tasks you'll like to generate content from
-                        </Text>
-                        <CheckboxCardGroup
-                          spacing="3"
-                          value={selectedTasks}
-                          onChange={(v) => setSelectedTasks(v as string[])}
-                        >
-                          {tasks.map((t) => (
-                            <CheckboxCard key={t.id} value={t.id}>
-                              <Text
-                                mb="2"
-                                fontSize="sm"
-                                fontWeight="medium"
-                                color="fg.emphasized"
-                              >
-                                {t.name}
-                              </Text>
-                              {(t.description || t.text_content) && (
-                                <Text
-                                  mt="2"
-                                  width="350px"
-                                  textStyle="sm"
-                                  color="fg.muted"
-                                  overflow="hidden"
-                                  whiteSpace="nowrap"
-                                  textOverflow="ellipsis"
-                                >
-                                  {t.description ?? t.text_content}
-                                </Text>
-                              )}
-                              {statuses.length > 1 && (
-                                <Badge
-                                  mt="2"
-                                  size="sm"
-                                  color="white"
-                                  w="fit-content"
-                                  display="block"
-                                  bg={t.status.color}
-                                >
-                                  {t.status.status}
-                                </Badge>
-                              )}
-                            </CheckboxCard>
-                          ))}
-                        </CheckboxCardGroup>
-                      </Stack>
-                    )}
+                        </VStack>
+                      )}
+                    </Stack>
                   </>
                 )}
               </Container>
