@@ -48,7 +48,7 @@ export const promptGenerator = (options: {
   You are an expert product manager.
   Using an array of tasks provided in JSON format representing bug fixes for a/an ${product_description} product, generate a summarized bug fix description for each task. Each update should:
 
-  1. Follow with a summary of the fixed bug based on the task title and description.
+  1. Follow with a concise summary of the fixed bug based on the task title and description.
   2. Ensure that the language used is ${tone} and suitable for a B2B audience.
 
   For example, if the task is:

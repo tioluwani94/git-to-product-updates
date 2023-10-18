@@ -481,40 +481,36 @@ export default function ClickupPage() {
                           on Clickup
                         </FormHelperText>
                       </FormControl>
+                      <FormControl>
+                        <FormLabel color="gray.600">Tone</FormLabel>
+                        <RadioButtonGroup
+                          size="sm"
+                          value={tone}
+                          onChange={(v) => setTone(v)}
+                        >
+                          {TONES.map((t) => (
+                            <RadioButton value={t.value} key={t.value}>
+                              {t.label}
+                            </RadioButton>
+                          ))}
+                        </RadioButtonGroup>
+                      </FormControl>
                       {content_type === "features" && (
-                        <>
-                          <FormControl>
-                            <FormLabel color="gray.600">Tone</FormLabel>
-                            <RadioButtonGroup
-                              size="sm"
-                              value={tone}
-                              onChange={(v) => setTone(v)}
-                            >
-                              {TONES.map((t) => (
-                                <RadioButton value={t.value} key={t.value}>
-                                  {t.label}
-                                </RadioButton>
-                              ))}
-                            </RadioButtonGroup>
-                          </FormControl>
-                          <FormControl>
-                            <FormLabel color="gray.600">
-                              Writing length
-                            </FormLabel>
+                        <FormControl>
+                          <FormLabel color="gray.600">Writing length</FormLabel>
 
-                            <RadioButtonGroup
-                              size="sm"
-                              value={writing_length}
-                              onChange={(v) => setWritingLength(v)}
-                            >
-                              {WRITING_LENGTH.map((t) => (
-                                <RadioButton value={t.value} key={t.value}>
-                                  {t.label}
-                                </RadioButton>
-                              ))}
-                            </RadioButtonGroup>
-                          </FormControl>
-                        </>
+                          <RadioButtonGroup
+                            size="sm"
+                            value={writing_length}
+                            onChange={(v) => setWritingLength(v)}
+                          >
+                            {WRITING_LENGTH.map((t) => (
+                              <RadioButton value={t.value} key={t.value}>
+                                {t.label}
+                              </RadioButton>
+                            ))}
+                          </RadioButtonGroup>
+                        </FormControl>
                       )}
                       <Stack w="100%" direction={{ base: "column", md: "row" }}>
                         <Button
