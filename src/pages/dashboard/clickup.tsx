@@ -38,7 +38,6 @@ import {
   FormControl,
   FormHelperText,
   FormLabel,
-  HStack,
   Heading,
   Input,
   Skeleton,
@@ -73,7 +72,6 @@ export default function ClickupPage() {
   const [selectedTasks, setSelectedTasks] = useState<string[]>([]);
   const [product_description, setProductDescription] = useState("");
   const [isGeneratingContent, setIsGeneratingConent] = useState(false);
-  const [end_date, setEndDate] = useState<string | undefined>(undefined);
   const [start_date, setStartDate] = useState<string | undefined>(undefined);
   const [selectedList, setSelectedList] = useState<string | undefined>(
     undefined
@@ -109,7 +107,6 @@ export default function ClickupPage() {
     isFetching: isFetchingTasks,
   } = useGetTasks(
     {
-      end_date,
       statuses,
       start_date,
       selectedList: selectedList ?? "",
@@ -447,35 +444,19 @@ export default function ClickupPage() {
                           </AutoCompleteList>
                         </AutoComplete>
                         <FormHelperText fontSize="xs">
-                          Most teams use Closed, Completed, Deployed or Deployed
-                          to production
+                          Most teams use Closed, Completed or Deployed
                         </FormHelperText>
                       </FormControl>
                       <FormControl>
                         <FormLabel>
-                          Select tasks completed between a date range
+                          Select tasks completed starting from this date
                         </FormLabel>
-                        <HStack w="100%">
-                          <FormControl>
-                            <FormLabel>Start date</FormLabel>
-                            <DatePicker
-                              value={start_date}
-                              inputProps={{ size: "sm" }}
-                              disabled={{ after: new Date() }}
-                              onChange={(value: any) => setStartDate(value)}
-                            />
-                          </FormControl>
-                          <FormControl>
-                            <FormLabel>End date</FormLabel>
-                            <DatePicker
-                              value={end_date}
-                              inputProps={{ size: "sm" }}
-                              disabled={{ after: new Date() }}
-                              onChange={(value: any) => setEndDate(value)}
-                            />
-                          </FormControl>
-                        </HStack>
-
+                        <DatePicker
+                          value={start_date}
+                          inputProps={{ size: "sm" }}
+                          disabled={{ after: new Date() }}
+                          onChange={(value: any) => setStartDate(value)}
+                        />
                         <FormHelperText fontSize="xs">
                           Use this option if your team has a done status setup
                           on Clickup

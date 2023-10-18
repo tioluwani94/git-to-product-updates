@@ -19,7 +19,6 @@ export default async function handler(
       statuses: s,
       archived,
       date_done_gt,
-      date_done_lt,
       include_closed,
     } = req.query;
 
@@ -33,7 +32,6 @@ export default async function handler(
         subtasks,
         archived,
         date_done_gt,
-        date_done_lt,
         include_closed,
         ...statuses?.reduce((a, c, i) => ({ ...a, [`statuses[${i}]`]: c }), {}),
       },

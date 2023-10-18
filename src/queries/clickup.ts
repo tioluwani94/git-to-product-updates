@@ -61,21 +61,19 @@ export const useGetList = (
 
 export const useGetTasks = (
   data: {
-    selectedList: string;
     statuses: string[];
+    selectedList: string;
     start_date: string | undefined;
-    end_date: string | undefined;
   },
   options?: UseQueryOptions<ClickupTask[]>
 ) => {
-  const { selectedList, statuses, start_date, end_date } = data;
+  const { selectedList, statuses, start_date } = data;
   return useQuery<ClickupTask[]>(
-    ["clickup-list-task", selectedList, statuses, start_date, end_date],
+    ["clickup-list-task", selectedList, statuses, start_date],
     () =>
       getTasks(selectedList ?? "", {
         archived: false,
         statuses: statuses,
-        date_done_lt: end_date ? getUnixTime(new Date(end_date)) : undefined,
         date_done_gt: start_date
           ? getUnixTime(new Date(start_date))
           : undefined,

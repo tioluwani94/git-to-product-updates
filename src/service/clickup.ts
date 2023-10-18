@@ -47,7 +47,6 @@ export const getTasks = async (
     subtasks?: boolean;
     statuses?: string[];
     date_done_gt?: number;
-    date_done_lt?: number;
     include_closed?: boolean;
   }
 ) => {
