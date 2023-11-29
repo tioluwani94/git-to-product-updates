@@ -14,7 +14,7 @@ export const CollapseIcon: React.FC<IconProps> = (props) => (
 export const LinearIcon: React.FC<IconProps> = () => (
   <Icon viewBox="0 0 50 50">
     <>
-      <g clip-path="url(#clip0_10_324)">
+      <g clipPath="url(#clip0_10_324)">
         <path
           d="M0.314819 29.2181L20.7819 49.6852C10.33 47.9185 2.08154 39.67 0.314819 29.2181Z"
           fill="currentColor"

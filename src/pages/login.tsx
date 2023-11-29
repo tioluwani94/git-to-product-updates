@@ -44,7 +44,7 @@ const LoginPage = () => {
               variant="secondary"
               onClick={() =>
                 signIn("linear", {
-                  callbackUrl: `${process.env.NEXT_PUBLIC_URL}dashboard/clickup`,
+                  callbackUrl: `${process.env.NEXT_PUBLIC_URL}dashboard/linear`,
                 })
               }
               transition="background-color border-color ease-in 0.2s"
