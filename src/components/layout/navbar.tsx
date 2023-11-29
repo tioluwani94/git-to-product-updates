@@ -74,7 +74,7 @@ export const Navbar = () => {
                       p="0.5rem"
                       rounded="8px"
                       cursor="pointer"
-                      onClick={() => signOut()}
+                      onClick={() => signOut({ callbackUrl: "/" })}
                       _hover={{ bg: "gray.100" }}
                     >
                       <ListIcon as={MdLogout} />

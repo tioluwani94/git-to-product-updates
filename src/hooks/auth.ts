@@ -10,6 +10,8 @@ export const useAuth = (route?: string) => {
     if (status === "authenticated") {
       if (session.provider === "clickup") {
         push("/dashboard/clickup");
+      } else if (session.provider === "linear") {
+        push("/dashboard/linear");
       } else {
         push("/dashboard");
       }
