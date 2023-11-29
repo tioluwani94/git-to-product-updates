@@ -112,7 +112,6 @@ export default async function handler(req: Request) {
     const stream = await OpenAIStream(payload);
     return new Response(stream);
   } catch (e: any) {
-    console.log({ e });
     return new Response(e, { status: 500 });
   }
 }
