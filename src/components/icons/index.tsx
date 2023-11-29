@@ -10,3 +10,33 @@ export const CollapseIcon: React.FC<IconProps> = (props) => (
     />
   </Icon>
 );
+
+export const LinearIcon: React.FC<IconProps> = () => (
+  <Icon viewBox="0 0 50 50">
+    <>
+      <g clip-path="url(#clip0_10_324)">
+        <path
+          d="M0.314819 29.2181L20.7819 49.6852C10.33 47.9185 2.08154 39.67 0.314819 29.2181Z"
+          fill="currentColor"
+        />
+        <path
+          d="M0 23.6615L26.3384 50C27.9048 49.9163 29.433 49.6885 30.9098 49.3297L0.670305 19.0902C0.311468 20.5671 0.0836953 22.0951 0 23.6615Z"
+          fill="currentColor"
+        />
+        <path
+          d="M1.9812 15.1595L34.8405 48.0188C36.0373 47.5051 37.186 46.9008 38.2778 46.2145L3.7855 11.7222C3.09915 12.814 2.49484 13.9627 1.9812 15.1595Z"
+          fill="currentColor"
+        />
+        <path
+          d="M6.01172 8.7068C10.5998 3.37573 17.3966 0 24.9819 0C38.7991 0 50 11.2009 50 25.018C50 32.6034 46.6243 39.4002 41.2932 43.9883L6.01172 8.7068Z"
+          fill="currentColor"
+        />
+      </g>
+      <defs>
+        <clipPath id="clip0_10_324">
+          <rect width="50" height="50" fill="white" />
+        </clipPath>
+      </defs>
+    </>
+  </Icon>
+);

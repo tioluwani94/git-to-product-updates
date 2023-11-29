@@ -8,7 +8,11 @@ export const theme = extendTheme(
       heading: "'InterVariable', -apple-system, system-ui, sans-serif",
       body: "'InterVariable', -apple-system, system-ui, sans-serif",
     },
-    colors: { ...baseTheme.colors, brand: baseTheme.colors.blue },
+    colors: {
+      ...baseTheme.colors,
+      brand: baseTheme.colors.blue,
+      linear: "#5e6ad2",
+    },
   },
   proTheme
 );

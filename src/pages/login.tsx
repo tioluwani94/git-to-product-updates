@@ -1,3 +1,4 @@
+import { LinearIcon } from "@/components/icons";
 import { Box, Button, Container, Heading, Stack } from "@chakra-ui/react";
 import { signIn } from "next-auth/react";
 // import { FaGithub } from "react-icons/fa";
@@ -38,6 +39,23 @@ const LoginPage = () => {
               }}
             >
               Continue with Clickup
+            </Button>
+            <Button
+              variant="secondary"
+              onClick={() =>
+                signIn("linear", {
+                  callbackUrl: `${process.env.NEXT_PUBLIC_URL}dashboard/clickup`,
+                })
+              }
+              transition="background-color border-color ease-in 0.2s"
+              leftIcon={<LinearIcon color="inherit" />}
+              _hover={{
+                color: "white",
+                bgColor: "linear",
+                borderColor: "linear",
+              }}
+            >
+              Continue with Linear
             </Button>
             {/* <Button
               variant="secondary"
