@@ -1,6 +1,6 @@
 /* eslint-disable react/no-unescaped-entities */
-import { ContentSection } from "@/components/dashboard/clickup/content-section";
-import { PageContainer } from "@/components/dashboard/clickup/page-container";
+import { ContentSection } from "@/components/dashboard/page/content-section";
+import { PageContainer } from "@/components/dashboard/page/page-container";
 import DatePicker from "@/components/date-picker";
 import {
   CheckboxCard,
@@ -15,6 +15,7 @@ import {
   RadioCardGroup,
 } from "@/components/layout/radio-card-group";
 import { Notification } from "@/components/notification";
+import { usePage } from "@/hooks/page";
 import {
   useGetClickupTeams,
   useGetFolderlessLists,
@@ -63,8 +64,6 @@ import {
 } from "react-resizable-panels";
 
 export default function ClickupPage() {
-  const [section, setSection] = useState(0);
-  const [summary, setSummary] = useState("");
   const [tone, setTone] = useState("formal");
   const [statuses, setStatuses] = useState<string[]>([]);
   const [content_type, setContentType] = useState("features");
@@ -80,8 +79,16 @@ export default function ClickupPage() {
     undefined
   );
 
-  const configPanelRef = useRef<ImperativePanelHandle>(null);
-  const contentPanelRef = useRef<ImperativePanelHandle>(null);
+  const {
+    summary,
+    section,
+    setSummary,
+    handleNext,
+    handlePrevious,
+    configPanelRef,
+    contentPanelRef,
+  } = usePage();
+
   const productDescriptionInputRef = useRef<HTMLInputElement>(null);
 
   const toast = useToast();
@@ -174,14 +181,6 @@ export default function ClickupPage() {
       setSummary((prev) => prev + chunkValue);
     }
     setIsGeneratingConent(false);
-  };
-
-  const handleNext = () => {
-    setSection(section + 1);
-  };
-
-  const handlePrevious = () => {
-    setSection(section - 1);
   };
 
   useEffect(() => {
