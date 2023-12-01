@@ -9,9 +9,9 @@ import {
 } from "@chakra-ui/react";
 
 export const PageCheckboxCard: React.FC<RadioProps> = (props) => {
-  const { children, ...rest } = props;
+  const { value, children, ...rest } = props;
   return (
-    <CheckboxCard {...rest}>
+    <CheckboxCard value={value ?? ""} {...rest}>
       <Stack direction="column" spacing="2">
         {children}
       </Stack>
