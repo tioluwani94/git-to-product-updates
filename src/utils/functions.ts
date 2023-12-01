@@ -1,3 +1,5 @@
+import { Children, ReactNode, isValidElement } from "react";
+
 export function appendObjToUrl(query: Record<string, any>) {
   const baseQuery = new URLSearchParams();
 
@@ -20,4 +22,10 @@ export function appendObjToUrl(query: Record<string, any>) {
   });
 
   return baseQuery.toString();
+}
+
+export function getValidChildren(children: ReactNode) {
+  return Children.toArray(children).filter((child) =>
+    isValidElement(child)
+  ) as React.ReactElement[];
 }

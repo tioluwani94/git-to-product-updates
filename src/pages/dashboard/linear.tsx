@@ -1,48 +1,108 @@
+/* eslint-disable react/no-unescaped-entities */
+import {
+  ActionButtons,
+  BackActionButton,
+  ConfirmActionButton,
+} from "@/components/dashboard/page/action-buttons";
+import {
+  PageCheckboxCard,
+  PageCheckboxCardDescription,
+  PageCheckboxCardTitle,
+} from "@/components/dashboard/page/checkbox-card";
+import { PageContainer } from "@/components/dashboard/page/container";
 import { ContentSection } from "@/components/dashboard/page/content-section";
-import { PageContainer } from "@/components/dashboard/page/page-container";
+import {
+  EmptyState,
+  EmptyStateButton,
+  EmptyStateHeading,
+  EmptyStateImage,
+  EmptyStateText,
+} from "@/components/dashboard/page/empty-state";
+import { ContentGenerationConfigForm } from "@/components/dashboard/page/form";
+import { LoadingSkeleton } from "@/components/dashboard/page/loading-skeleton";
+import { CheckboxCardGroup } from "@/components/layout/checkbox-card-group";
 import {
   RadioCard,
   RadioCardGroup,
 } from "@/components/layout/radio-card-group";
 import { usePage } from "@/hooks/page";
-import { useGetTeams } from "@/queries/linear";
 import {
-  Box,
-  Button,
-  Container,
-  Heading,
-  Skeleton,
-  Stack,
-  Text,
-} from "@chakra-ui/react";
-import React, { useState } from "react";
+  useGetTeam,
+  useGetTeamIssueStates,
+  useGetTeamIssues,
+  useGetTeams,
+} from "@/queries/linear";
+import { Box, Container, Heading, Stack, Text, Code } from "@chakra-ui/react";
+import { useEffect, useState } from "react";
 import { Panel, PanelGroup, PanelResizeHandle } from "react-resizable-panels";
 
 export default function LinearPage() {
-  const { data: teams, isLoading: isLoadingTeams } = useGetTeams();
+  const [selectedTeam, setSelectedTeam] = useState("");
 
   const {
     summary,
     section,
+    statuses,
+    start_date,
+    content_type,
+    selectedTasks,
+    configPanelRef,
+    contentPanelRef,
+    isGeneratingContent,
+    product_description,
+    productDescriptionInputRef,
     setSummary,
     handleNext,
     handlePrevious,
-    configPanelRef,
-    contentPanelRef,
+    setSelectedTasks,
+    handleGenerateContent,
+    handleToggleConfigPanel,
   } = usePage();
 
-  const [selectedTeam, setSelectedTeam] = useState("");
+  const { data, isLoading: isLoadingTeams } = useGetTeams();
+  const { data: team } = useGetTeam(selectedTeam, {
+    enabled: !!selectedTeam,
+  });
+  const { data: statesData } = useGetTeamIssueStates(selectedTeam, {
+    enabled: !!selectedTeam,
+  });
 
-  const handleToggleConfigPanel = () => {
-    if (configPanelRef.current) {
-      const isCollapsed = configPanelRef.current.getCollapsed();
-      if (isCollapsed) {
-        configPanelRef.current.expand();
-      } else {
-        configPanelRef.current.collapse();
-      }
+  const {
+    data: tasksData,
+    isLoading: isLoadingTasks,
+    isFetching: isFetchingTasks,
+  } = useGetTeamIssues(
+    {
+      start_date,
+      states: statuses,
+      team_id: selectedTeam ?? "",
+    },
+    {
+      enabled: !!(selectedTeam && statuses.length),
     }
+  );
+
+  const tasks = tasksData?.issues;
+
+  const handleGenerateAIContent = () => {
+    handleGenerateContent({
+      content_type,
+      product_description,
+      tasks:
+        tasks
+          ?.filter((t) => selectedTasks.includes(t.id))
+          .map((t) => ({
+            title: t.title,
+            description: t.description,
+          })) ?? [],
+    });
   };
+
+  useEffect(() => {
+    if (productDescriptionInputRef.current && section === 1) {
+      productDescriptionInputRef.current.focus();
+    }
+  }, [productDescriptionInputRef, section]);
 
   return (
     <PageContainer>
@@ -62,43 +122,148 @@ export default function LinearPage() {
               <Container>
                 {section === 0 && (
                   <Stack spacing="4">
-                    <Heading size="xs">Select a space</Heading>
+                    <Heading size="xs">Select a team</Heading>
                     {isLoadingTeams ? (
-                      <Stack spacing="3">
-                        {Array.from({ length: 8 }, (v, i) => (
-                          <Skeleton
-                            h="45px"
-                            key={`${i}`}
-                            rounded="md"
-                            endColor="gray.200"
-                            startColor="gray.100"
-                          />
-                        ))}
-                      </Stack>
+                      <LoadingSkeleton />
                     ) : (
                       <RadioCardGroup
                         spacing="3"
                         value={selectedTeam}
                         onChange={(v) => setSelectedTeam(v)}
                       >
-                        {teams?.map((s: any) => (
-                          <RadioCard shadow="xs" value={s.id} key={s.id}>
+                        {data?.teams?.map((team: any) => (
+                          <RadioCard shadow="xs" value={team.id} key={team.id}>
                             <Text fontSize="sm" fontWeight="medium">
-                              {s.name}
+                              {team.name}
                             </Text>
                           </RadioCard>
                         ))}
                       </RadioCardGroup>
                     )}
-                    <Button
-                      size="sm"
-                      colorScheme="blue"
+                    <ConfirmActionButton
+                      w="100%"
                       onClick={handleNext}
                       isDisabled={!selectedTeam}
                     >
                       Next
-                    </Button>
+                    </ConfirmActionButton>
                   </Stack>
+                )}
+                {section === 1 && (
+                  <Stack spacing="4">
+                    <Heading size="xs">
+                      Generate content for{" "}
+                      <Code rounded="md">{team?.name}</Code> team
+                    </Heading>
+                    <Stack spacing="8">
+                      <ContentGenerationConfigForm
+                        statusOptions={
+                          statesData?.states.map((s) => ({
+                            value: s.name,
+                            label: s.name,
+                            color: s.color,
+                          })) ?? []
+                        }
+                      />
+                      <ActionButtons>
+                        <BackActionButton onClick={handlePrevious}>
+                          Back
+                        </BackActionButton>
+                        <ConfirmActionButton
+                          onClick={handleNext}
+                          loadingText="Fetching issues..."
+                          isLoading={isLoadingTasks && isFetchingTasks}
+                          isDisabled={isLoadingTasks || !product_description}
+                        >
+                          Next
+                        </ConfirmActionButton>
+                      </ActionButtons>
+                    </Stack>
+                  </Stack>
+                )}
+
+                {section === 2 && (
+                  <>
+                    <Stack spacing="6">
+                      <Heading size="xs">
+                        Generate content for{" "}
+                        <Code rounded="md">{team?.name}</Code> team
+                      </Heading>
+
+                      {tasks?.length ? (
+                        <>
+                          <ActionButtons>
+                            <BackActionButton onClick={handlePrevious}>
+                              Back
+                            </BackActionButton>
+                            <ConfirmActionButton
+                              type="submit"
+                              isLoading={isGeneratingContent}
+                              onClick={handleGenerateAIContent}
+                              isDisabled={!selectedTasks?.length}
+                            >
+                              Generate content
+                            </ConfirmActionButton>
+                          </ActionButtons>
+                          <Text
+                            fontSize="lg"
+                            fontWeight="medium"
+                            color="fg.emphasized"
+                          >
+                            Select the issues you'll like to generate content
+                            from
+                          </Text>
+                          <CheckboxCardGroup
+                            spacing="3"
+                            value={selectedTasks}
+                            onChange={(v) => setSelectedTasks(v as string[])}
+                          >
+                            {tasks?.map((t) => (
+                              <PageCheckboxCard key={t.id} value={t.id}>
+                                <PageCheckboxCardTitle>
+                                  {t.title}
+                                </PageCheckboxCardTitle>
+                                {t.description && (
+                                  <PageCheckboxCardDescription>
+                                    {t.description}
+                                  </PageCheckboxCardDescription>
+                                )}
+                                {/* {statuses.length > 1 && (
+                                  <PageCheckboxCardBadge bg={t.status.color}>
+                                    {t.status.status}
+                                  </PageCheckboxCardBadge>
+                                )} */}
+                              </PageCheckboxCard>
+                            ))}
+                          </CheckboxCardGroup>
+                          <ActionButtons>
+                            <BackActionButton onClick={handlePrevious}>
+                              Back
+                            </BackActionButton>
+                            <ConfirmActionButton
+                              isLoading={isGeneratingContent}
+                              onClick={handleGenerateAIContent}
+                              isDisabled={!selectedTasks?.length}
+                            >
+                              Generate content
+                            </ConfirmActionButton>
+                          </ActionButtons>
+                        </>
+                      ) : (
+                        <EmptyState>
+                          <EmptyStateImage />
+                          <EmptyStateHeading>No Issues</EmptyStateHeading>
+                          <EmptyStateText>
+                            No issues for the selected configuration{" "}
+                            <span role="img">😔</span>
+                          </EmptyStateText>
+                          <EmptyStateButton onClick={handlePrevious}>
+                            Go back
+                          </EmptyStateButton>
+                        </EmptyState>
+                      )}
+                    </Stack>
+                  </>
                 )}
               </Container>
             </Box>
@@ -133,3 +298,5 @@ export default function LinearPage() {
     </PageContainer>
   );
 }
+
+LinearPage.auth = true;

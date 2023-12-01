@@ -23,7 +23,7 @@ export default async function handler(
 
     const team = await linearClient.team(id as string);
 
-    res.status(200).json({ team: team });
+    res.status(200).json({ team });
   } catch (error) {
     res.status(500).json({ error: "An error occured" });
   }

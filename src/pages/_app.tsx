@@ -13,6 +13,7 @@ import {
 } from "@tanstack/react-query";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import { ProtectedRoute } from "@/components/protected";
+import { PageProvider } from "@/hooks/page";
 
 export default function App({
   Component,
@@ -42,9 +43,11 @@ export default function App({
               //@ts-ignore
               Component.auth ? (
                 <ProtectedRoute>
-                  <AppLayout>
-                    <Component {...pageProps} />
-                  </AppLayout>
+                  <PageProvider>
+                    <AppLayout>
+                      <Component {...pageProps} />
+                    </AppLayout>
+                  </PageProvider>
                 </ProtectedRoute>
               ) : (
                 <AppLayout>

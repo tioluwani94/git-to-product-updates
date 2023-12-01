@@ -18,20 +18,36 @@ export default async function handler(
       //@ts-ignore
       (await getServerSession(req, res, authOptions)) ?? {};
 
-    const { team_id: id, filter } = req.query;
+    const { team_id: id, states, start_date } = req.query;
+
+    let filter = {};
 
     const linearClient = new LinearClient({
       accessToken,
     });
 
+    if (states) {
+      filter = {
+        ...filter,
+        state: { name: { in: states as string[] } },
+      };
+    }
+
+    if (start_date) {
+      filter = {
+        ...filter,
+        completedAt: { gte: new Date(start_date as string) },
+      };
+    }
+
     const team = await linearClient.team(id as string);
     const teamIssues = await team.issues({
-      filter: {
-        state: { name: { eq: filter as string } },
-      },
+      filter,
     });
 
-    res.status(200).json({ team: team, issues: teamIssues.nodes });
+    res
+      .status(200)
+      .json({ meta: teamIssues.pageInfo, issues: teamIssues.nodes });
   } catch (error) {
     res.status(500).json({ error: "An error occured" });
   }
