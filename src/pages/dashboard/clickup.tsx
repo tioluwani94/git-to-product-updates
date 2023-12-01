@@ -26,6 +26,7 @@ import {
   RadioCard,
   RadioCardGroup,
 } from "@/components/layout/radio-card-group";
+import { Notification } from "@/components/notification";
 import { usePage } from "@/hooks/page";
 import {
   useGetClickupTeams,
@@ -47,6 +48,7 @@ import {
   Heading,
   Stack,
   Text,
+  useToast,
 } from "@chakra-ui/react";
 import { useEffect, useState } from "react";
 import { Panel, PanelGroup, PanelResizeHandle } from "react-resizable-panels";
@@ -59,6 +61,7 @@ export default function ClickupPage() {
     undefined
   );
 
+  const toast = useToast();
   const {
     summary,
     section,
@@ -113,6 +116,33 @@ export default function ClickupPage() {
     },
     {
       enabled: !!(selectedList && statuses.length),
+      onSuccess: (data) => {
+        if (!!data.length) {
+          toast({
+            position: "bottom-left",
+            render: ({ onClose }) => (
+              <Notification
+                status="success"
+                onClose={onClose}
+                message={`${data.length} ${
+                  data.length > 1 ? "tasks" : "task"
+                } retrived`}
+              />
+            ),
+          });
+        } else {
+          toast({
+            position: "bottom-left",
+            render: ({ onClose }) => (
+              <Notification
+                status="error"
+                onClose={onClose}
+                message="No tasks retrived"
+              />
+            ),
+          });
+        }
+      },
     }
   );
 

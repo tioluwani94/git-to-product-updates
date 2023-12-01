@@ -25,6 +25,7 @@ import {
   RadioCard,
   RadioCardGroup,
 } from "@/components/layout/radio-card-group";
+import { Notification } from "@/components/notification";
 import { usePage } from "@/hooks/page";
 import {
   useGetTeam,
@@ -32,13 +33,22 @@ import {
   useGetTeamIssues,
   useGetTeams,
 } from "@/queries/linear";
-import { Box, Container, Heading, Stack, Text, Code } from "@chakra-ui/react";
+import {
+  Box,
+  Container,
+  Heading,
+  Stack,
+  Text,
+  Code,
+  useToast,
+} from "@chakra-ui/react";
 import { useEffect, useState } from "react";
 import { Panel, PanelGroup, PanelResizeHandle } from "react-resizable-panels";
 
 export default function LinearPage() {
   const [selectedTeam, setSelectedTeam] = useState("");
 
+  const toast = useToast();
   const {
     summary,
     section,
@@ -79,6 +89,33 @@ export default function LinearPage() {
     },
     {
       enabled: !!(selectedTeam && statuses.length),
+      onSuccess: (data) => {
+        if (!!data.issues.length) {
+          toast({
+            position: "bottom-left",
+            render: ({ onClose }) => (
+              <Notification
+                status="success"
+                onClose={onClose}
+                message={`${data.issues.length} ${
+                  data.issues.length > 1 ? "issues" : "issue"
+                } retrived`}
+              />
+            ),
+          });
+        } else {
+          toast({
+            position: "bottom-left",
+            render: ({ onClose }) => (
+              <Notification
+                status="error"
+                onClose={onClose}
+                message="No issues retrived"
+              />
+            ),
+          });
+        }
+      },
     }
   );
 
